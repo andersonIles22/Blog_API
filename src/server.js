@@ -5,6 +5,8 @@ const { MESSAGES_OPERATION } = require('./constants/statusMessages');
 const { router } = require('./routes/authRoutes');
 
 const app=express();
+app.use(express.json());
+
 const PORT=process.env.PORT||3002;
 
 app.use('/',router);

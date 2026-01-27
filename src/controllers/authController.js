@@ -67,7 +67,7 @@ const login= async (req,res,next)=>{
         const accesstoken=jwt.sign(
             {id:user.id,gmail:user.email},
             process.env.JWT_SECRET,
-            {expired:process.env.JWT_EXPIRES_IN||'15m'}
+            {expiresIn:process.env.JWT_EXPIRES_IN||'15m'}
         )
 
         res.status(HTTP_STATUS.OK).json({

@@ -1,4 +1,4 @@
-const express=require('expresss');
+const express=require('express');
 const { errorHandler, error } = require('./middleware/errorHandler');
 const { HTTP_STATUS } = require('./constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('./constants/statusMessages');

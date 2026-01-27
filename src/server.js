@@ -6,7 +6,7 @@ const { MESSAGES_OPERATION } = require('./constants/statusMessages');
 const app=express();
 const PORT=process.env.PORT||3002;
 
-app.get('/',(res,req)=>{
+app.get('/',(req,res)=>{
     res.json({
         success:true,
         message:"API Blog is working!!"

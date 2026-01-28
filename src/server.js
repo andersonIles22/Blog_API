@@ -2,14 +2,16 @@ const express=require('express');
 const { errorHandler, error } = require('./middleware/errorHandler');
 const { HTTP_STATUS } = require('./constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('./constants/statusMessages');
-const { router } = require('./routes/authRoutes');
+const authRoutes = require('./routes/authRoutes');
+const postsRoutes=require('./routes/postsRoutes')
 
 const app=express();
 app.use(express.json());
 
 const PORT=process.env.PORT||3002;
 
-app.use('/',router);
+app.use('/',postsRoutes);
+app.user('/',authRoutes)
 
 app.use((req,res,next)=>{
     error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.URL_NO_FOUND(req.originalUrl),next)

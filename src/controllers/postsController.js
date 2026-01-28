@@ -34,7 +34,7 @@ const getAllPost=async(req,res,next)=>{
                 u.email
             FROM posts p JOIN users u
             ON p.author_id=u.id
-            WHERE p.published=true,
+            WHERE p.published=true
             ORDER BY p.created_at DESC
             `
         );

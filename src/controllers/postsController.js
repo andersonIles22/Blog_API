@@ -8,7 +8,7 @@ const {MESSAGES_OPERATION}=require('../constants/statusMessages')
 const createPost=async(req,res,next)=>{
     try {
    const {title,content,published}=req.body;
-   console.log(req)
+   console.log(req.user)
     const author_id=req.user.id;
 
     const queryPost=await db.query(

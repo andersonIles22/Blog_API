@@ -12,7 +12,7 @@ const createPost=async(req,res,next)=>{
     const author_id=req.user.id;
 
     const queryPost=await db.query(
-        `INSERT INTO  posts (title, content, author_id, published) VALUES($1,$2,$3,$3) RETURNING *`,
+        `INSERT INTO  posts (title, content, author_id, published) VALUES($1,$2,$3,$4) RETURNING *`,
         [title,content,author_id,published||false]
     )
     res.status(HTTP_STATUS.CREATED).json({

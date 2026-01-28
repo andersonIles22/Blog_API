@@ -5,8 +5,8 @@ const { authMiddleware } = require('../middleware/auth');
 
 const router=express.Router();
 
-router.use(authMiddleware)
-router.post('/all',postControllers.createPost);
+
+router.post('/all',authMiddleware,postControllers.createPost);
 
 router.get('/all',postControllers.getAllPost)
 

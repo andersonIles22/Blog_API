@@ -11,6 +11,4 @@ router.post('/',postControllers.createPost);
 router.get('/',authMiddleware,postControllers.getAllPost)
 
 
-module.exports={
-    router
-}
+module.exports=router

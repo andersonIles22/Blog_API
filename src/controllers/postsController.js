@@ -8,7 +8,6 @@ const {MESSAGES_OPERATION}=require('../constants/statusMessages')
 const createPost=async(req,res,next)=>{
     try {
    const {title,content,published}=req.body;
-   console.log(req.user)
     const author_id=req.user.id;
 
     const queryPost=await db.query(
@@ -28,7 +27,6 @@ const createPost=async(req,res,next)=>{
 const getPostById=async (req,res,next) => {
     try {
         const id=parseInt(req.params.id);
-        console.log(id);
         const queryGetById= await db.query(
             `SELECT * FROM posts WHERE id=$1`,
             [id]
@@ -60,7 +58,7 @@ const getAllPost=async(req,res,next)=>{
             success:true,
             message:"Get data successfully",
             count:queryGetPost.rows.length,
-            data:queryGetPost.rows[0]
+            data:queryGetPost.rows
         });
     } catch (error) {
         next(error);

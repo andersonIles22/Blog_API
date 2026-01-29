@@ -27,8 +27,8 @@ const createPost=async(req,res,next)=>{
 
 const getPostById=async (req,res,next) => {
     try {
-        const {id}=req.params;
-        
+        const id=parseInt(req.params.id);
+
         const queryGetById= await db.query(
             `SELECT * FROM posts WHERE id=$1`,
             [id]

@@ -2,7 +2,7 @@ const express=require('express');
 const postControllers=require('../controllers/postsController');
 const { authMiddleware } = require('../middleware/auth');
 const { validateIdPost } = require('../middleware/validationInputs');
-const commentRoutes=require('../controllers/commentController')
+const commentRoutes=require('../routes/commentRoutes')
 
 const router=express.Router();
 

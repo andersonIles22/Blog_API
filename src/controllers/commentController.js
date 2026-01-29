@@ -1,4 +1,4 @@
-const db=require('pg');
+const db=require('../config/database');
 const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { error } = require('../middleware/errorHandler');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');

@@ -126,5 +126,6 @@ module.exports={
     validateRegister,
     validateLogin,
     validateChangePassword,
-    validateIdPost
+    validateIdPost,
+    validateCommentPost
 };

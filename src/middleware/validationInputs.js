@@ -1,6 +1,6 @@
 const {body,validationResult}=require('express-validator');
 const {VALIDATION_VALUES}=require('../constants/values_validations');
-const {MESSAGES_VALIDATION}=require('../constants/statusMessages');
+const {MESSAGES_VALIDATION}=require('../constants/messagesValidation');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
 
 const validateRegister=[
@@ -85,8 +85,27 @@ const validateChangePassword = [
     next();
   }
 ];
+
+const validateIdPost=[
+    param('id')
+        .isInt({min:VALIDATION_VALUES.MIN_VALUE_ID}).withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER)
+        .trim(),
+    (req,res,next)=>{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                success: false,
+                errors:errors.array().map(err=>({
+                    field:err.path,
+                    message:err.msg
+                 }))
+            })
+        }
+    }
+]
 module.exports={
     validateRegister,
     validateLogin,
-    validateChangePassword   
+    validateChangePassword,
+    validateIdPost
 };

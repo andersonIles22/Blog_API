@@ -35,7 +35,7 @@ const getPostById=async (req,res,next) => {
         )
         const post=queryGetById.rows[0];
 
-        if(!post.id) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND);
+        if(post.length===0) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND);
 
         res.status(HTTP_STATUS.OK).json({
             post:post

@@ -8,6 +8,7 @@ const MESSAGES_OPERATION= Object.freeze({
     EMAIL_INVALID:"Email Invalid",
     PASSWORD_INVALID:"Password invalid",
     USER_NOT_FOUND:"User not found",
+    POST_NOT_FOUND:"The Post does not exist",
     TOKEN_INVALID:"Token Invalid",
     TOKEN_REQUIRED:"Token Required",
     TOKEN_EXPIRED:'Token has expired',

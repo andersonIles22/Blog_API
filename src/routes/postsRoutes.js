@@ -9,8 +9,8 @@ const router=express.Router();
 
 router.post('/all',authMiddleware,postControllers.createPost);
 
-router.get('/:id',validateIdPost,postControllers.getPostById)
 router.get('/all',postControllers.getAllPost)
+router.get('/:id',validateIdPost,postControllers.getPostById)
 
 
 module.exports=router

@@ -10,8 +10,8 @@ app.use(express.json());
 
 const PORT=process.env.PORT||3002;
 
-app.use('/api/posts',postsRoutes); //
-app.use('/api/auth',authRoutes)
+app.use('/api/posts',postsRoutes); 
+app.use('/api/auth',authRoutes);
 
 app.use((req,res,next)=>{
     error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.URL_NO_FOUND(req.originalUrl),next)

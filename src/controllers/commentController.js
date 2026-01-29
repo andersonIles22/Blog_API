@@ -10,7 +10,7 @@ const postsComment= async(req,res,next)=>{
         const {post_comment}=req.body;
 
         const queryGetPost= await db.query(
-            `SELECT * FROM posts WHERE post_id=$1`,
+            `SELECT * FROM posts WHERE id=$1`,
             [post_id]
         );
         const post=queryGetPost.rows[0];

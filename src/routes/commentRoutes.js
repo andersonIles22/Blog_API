@@ -4,7 +4,7 @@ const { authMiddleware } = require('../middleware/auth');
 const commentControllers=require('../controllers/commentController');
 
 
-const router=express.Router();
+const router=express.Router({mergeParams:true});
 
 router.post('/',authMiddleware,validateIdPost,validateCommentPost,commentControllers.postsComment);
 

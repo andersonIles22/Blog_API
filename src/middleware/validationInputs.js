@@ -87,7 +87,7 @@ const validateChangePassword = [
 ];
 
 const validateIdPost=[
-    param('id')
+    param('post_id')
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_ID}).withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER)
         .trim(),
     (req,res,next)=>{
@@ -101,6 +101,24 @@ const validateIdPost=[
                  }))
             })
         }
+        next();
+    }
+]
+
+const validateCommentPost=[
+    body('post_comment')
+        .trim()
+        .notEmpty().withMessage(MESSAGES_VALIDATION.COMMENT_IS_EMPTY)
+        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_COMMENT}).withMessage(MESSAGES_VALIDATION.COMMENT_TOO_SHORT),
+    (req,res,next)=>{
+        const errors=validationResult(req);
+        if(!errors.isEmpty)return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            success: false,
+            errors:errors.array().map(err=>({
+                field:err.path,
+                message:err.msg
+            }))
+        });
         next();
     }
 ]

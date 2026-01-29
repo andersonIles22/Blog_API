@@ -7,6 +7,7 @@ const { MESSAGES_OPERATION } = require('../constants/statusMessages');
 const postsComment= async(req,res,next)=>{
     try {
         const post_id=parseInt(req.params.post_id);
+        const author_comment_id=req.user.id;
         const {post_comment}=req.body;
 
         const queryGetPost= await db.query(
@@ -17,7 +18,7 @@ const postsComment= async(req,res,next)=>{
 
         const queryCommentOnPost=await db.query(
             `INSERT INTO comments (post_id,author_id,content) VALUES($1,$2,$3)`,
-            [post_id,post.author_id,post_comment]
+            [post_id,author_comment_id,post_comment]
         );
 
         res.status(HTTP_STATUS.CREATED).json({

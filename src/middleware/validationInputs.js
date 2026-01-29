@@ -101,6 +101,7 @@ const validateIdPost=[
                  }))
             })
         }
+        next();
     }
 ]
 module.exports={

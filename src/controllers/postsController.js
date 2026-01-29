@@ -28,6 +28,7 @@ const getPostById=async (req,res,next) => {
     try {
         const id=parseInt(req.params.post_id);
         console.log(id)
+        console.log(req.params)
         const queryGetById= await db.query(
             `SELECT * FROM posts WHERE id=$1`,
             [id]

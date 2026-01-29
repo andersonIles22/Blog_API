@@ -1,4 +1,4 @@
-const {body,validationResult}=require('express-validator');
+const {body,param,validationResult}=require('express-validator');
 const {VALIDATION_VALUES}=require('../constants/values_validations');
 const {MESSAGES_VALIDATION}=require('../constants/messagesValidation');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');

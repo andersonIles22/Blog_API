@@ -16,7 +16,7 @@ const postsComment= async(req,res,next)=>{
         const post=queryGetPost.rows[0];
 
         const queryCommentOnPost=await db.query(
-            `INSERT INTO comments (post_id,author_id,content VALUES($1,$2,$3))`,
+            `INSERT INTO comments (post_id,author_id,content) VALUES($1,$2,$3)`,
             [post_id,post.author_id,post_comment]
         );
 

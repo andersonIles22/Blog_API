@@ -86,6 +86,54 @@ const validateChangePassword = [
   }
 ];
 
+const validatePost=[
+    body('title')
+        .trim()
+        .notEmpty()
+            .withMessage(MESSAGES_VALIDATION.TITLE_POST_IS_EMPTY)
+        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_TITLE_POST,max:VALIDATION_VALUES.MAX_LENGTH_TITLE_POST})
+            .withMessage(MESSAGES_VALIDATION.TITLE_POSTS_MIN_AND_MAX_CHARACTERS),
+    body('content')
+        .trim()
+        .notEmpty()
+            .withMessage(MESSAGES_VALIDATION.TITLE_POST_IS_EMPTY)
+        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_CONTENT_POST})
+            .withMessage(MESSAGES_VALIDATION.CONTENT_POSTS_MIN_CHARACTERS),
+    (req,res,next)=>{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                success: false,
+                errors:errors.array().map(err=>({
+                    field:err.path,
+                    message:err.msg
+                    }))
+            })
+        }
+        next();
+    }
+]
+const validateUpdate=[
+    param('post_id')
+        .isInt({min:VALIDATION_VALUES.MIN_VALUE_ID}).withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER)
+        .trim(),
+    body('title')
+        .trim()
+        .optional()
+        .notEmpty()
+            .withMessage(MESSAGES_VALIDATION.TITLE_POST_IS_EMPTY)
+        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_TITLE_POST,max:VALIDATION_VALUES.MAX_LENGTH_TITLE_POST})
+            .withMessage(MESSAGES_VALIDATION.TITLE_POSTS_MIN_AND_MAX_CHARACTERS),
+    body('content')
+        .trim()
+        .optional()
+        .notEmpty()
+            .withMessage(MESSAGES_VALIDATION.CONTENT_POST_IS_EMPTY)
+        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_CONTENT_POST})
+            .withMessage(MESSAGES_VALIDATION.CONTENT_POSTS_MIN_CHARACTERS),
+    
+];
+
 const validateIdPost=[
     param('post_id')
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_ID}).withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER)
@@ -108,8 +156,10 @@ const validateIdPost=[
 const validateCommentPost=[
     body('post_comment')
         .trim()
-        .notEmpty().withMessage(MESSAGES_VALIDATION.COMMENT_IS_EMPTY)
-        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_COMMENT}).withMessage(MESSAGES_VALIDATION.COMMENT_TOO_SHORT),
+        .notEmpty()
+            .withMessage(MESSAGES_VALIDATION.COMMENT_IS_EMPTY)
+        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_COMMENT,max:VALIDATION_VALUES.MAX_LENGTH_COMMENT})
+            .withMessage(MESSAGES_VALIDATION.COMMENT_LIMIT_CHARACTERS),
     (req,res,next)=>{
         const errors=validationResult(req);
         if(!errors.isEmpty)return res.status(HTTP_STATUS.BAD_REQUEST).json({
@@ -126,6 +176,8 @@ module.exports={
     validateRegister,
     validateLogin,
     validateChangePassword,
+    validatePost,
     validateIdPost,
-    validateCommentPost
+    validateCommentPost,
+    validateUpdate
 };

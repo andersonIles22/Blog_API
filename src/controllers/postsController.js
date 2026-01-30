@@ -67,8 +67,31 @@ const getAllPost=async(req,res,next)=>{
     }
 }
 
+const updatePost=async (req,res,next) => {
+    try {
+        const {id}=req.user;
+        const {post_id}=req.params;
+        const {title,content}=req.body;
+
+        const queryUpdatePost= await db.query(
+            `UPDATE posts
+            SET title=COALESCE($1,title), content=COALESCE($2,content)
+            WHERE id=$3 AND author_id=$4
+            RETURNING *`
+            [title,content,post_id,id]
+        )
+
+        if(queryUpdatePost.rowCount===0) return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.NOT_IS_AUTHOR,next);
+
+        res.status(HTTP_STATUS.OK,MESSAGES_OPERATION.SUCCESFUL_OPERATION)
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports={
     createPost,
     getPostById,
-    getAllPost
+    getAllPost,
+    updatePost
 }

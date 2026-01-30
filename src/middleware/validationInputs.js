@@ -162,6 +162,7 @@ const validateCommentPost=[
         .isLength({min:VALIDATION_VALUES.MIN_LENGTH_COMMENT,max:VALIDATION_VALUES.MAX_LENGTH_COMMENT})
             .withMessage(MESSAGES_VALIDATION.COMMENT_LIMIT_CHARACTERS),
     (req,res,next)=>{
+        console.log("entro al validatecommentPost")
         const errors=validationResult(req);
         if(!errors.isEmpty)return res.status(HTTP_STATUS.BAD_REQUEST).json({
             success: false,

@@ -97,7 +97,7 @@ const validatePost=[
     body('content')
         .trim()
         .notEmpty()
-            .withMessage(MESSAGES_VALIDATION.TITLE_POST_IS_EMPTY)
+            .withMessage(MESSAGES_VALIDATION.COMMENT_IS_EMPTY)
         .isLength({min:VALIDATION_VALUES.MIN_LENGTH_CONTENT_POST})
             .withMessage(MESSAGES_VALIDATION.CONTENT_POSTS_MIN_CHARACTERS),
     (req,res,next)=>{

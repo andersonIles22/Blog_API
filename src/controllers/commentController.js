@@ -16,6 +16,7 @@ const postsComment= async(req,res,next)=>{
         );
         const post=queryGetPost.rows[0];
 
+        if(!post) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND)
         const queryCommentOnPost=await db.query(
             `INSERT INTO comments (post_id,author_id,content) VALUES($1,$2,$3)`,
             [post_id,author_comment_id,post_comment]

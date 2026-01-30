@@ -157,10 +157,8 @@ const validateIdPost=[
 const validateCommentPost=[
     body('post_comment')
         .trim()
-        .notEmpty()
-            .withMessage(MESSAGES_VALIDATION.COMMENT_IS_EMPTY)
-        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_COMMENT,max:VALIDATION_VALUES.MAX_LENGTH_COMMENT})
-            .withMessage(MESSAGES_VALIDATION.COMMENT_LIMIT_CHARACTERS),
+        .notEmpty().withMessage(MESSAGES_VALIDATION.COMMENT_IS_EMPTY)
+        .isLength({min:VALIDATION_VALUES.MIN_LENGTH_COMMENT,max:VALIDATION_VALUES.MAX_LENGTH_COMMENT}).withMessage(MESSAGES_VALIDATION.COMMENT_LIMIT_CHARACTERS),
     (req,res,next)=>{
         console.log("entro al validatecommentPost")
         const errors=validationResult(req);

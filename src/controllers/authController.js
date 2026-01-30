@@ -48,12 +48,13 @@ const register=async (req,res,next)=>{
 const login= async (req,res,next)=>{
     try {
         const {email,password}=req.body;
+        console.log(email,password);
+        
         //Comprobamos de que usuario exista
         const queryGetData= await db.query(
             `SELECT id,email, password FROM users WHERE email=$1`,
             [email]
         );
-        console.log(queryGetData);
         const user=queryGetData.rows[0];
         if (!user) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.USER_NOT_FOUND,next);
 

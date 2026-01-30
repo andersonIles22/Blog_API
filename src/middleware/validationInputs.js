@@ -37,7 +37,8 @@ const validateLogin=[
         .normalizeEmail(),
     body('password')
         .trim()
-        .notEmpty().withMessage(MESSAGES_VALIDATION.PASSWORD_EMPTY),
+        .notEmpty()
+            .withMessage(MESSAGES_VALIDATION.PASSWORD_EMPTY),
     (req,res,next)=>{
         const errors=validationResult(req);
         if(!errors.isEmpty()){

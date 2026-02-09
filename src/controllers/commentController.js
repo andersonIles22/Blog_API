@@ -34,7 +34,7 @@ const postsComment= async(req,res,next)=>{
 const getPostcomments=async (req,res,next) => {
     try {
         const post_id=parseInt(req.params.post_id);
-        const {page,limit}=req.query;
+        const {page,limit}=matchedData(req);
         const offset=(page-1)*limit;
 
 
@@ -60,7 +60,7 @@ const getPostcomments=async (req,res,next) => {
             `,
             [post_id,limit,offset]
         );
-        const comments=queryGetCommentsOnPost.rows;
+        const comments=queryGetCommentsOnPost.rows[0];
         const numberOfPages=Math.ceil(comments.length/limit);
         if(p>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 

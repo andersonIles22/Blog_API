@@ -46,7 +46,6 @@ const getPostById=async (req,res,next) => {
 const getAllPost=async(req,res,next)=>{
     try {
         const {page,limit}=matchedData(req);
-        console.log(page,limit)
         const offset=(page-1)*limit;
         
         const queryGetAllPost= await db.query(
@@ -75,7 +74,7 @@ const getAllPost=async(req,res,next)=>{
             success:true,
             message:"Get data successfully",
             pagination:{
-                totalPosts:queryGetAllPost.rows.length,
+                totalPosts:queryGetAllPost.rows[0].length,
                 totalPages:numberOfPages,
                 currentPage:page,
                 pageSize:limit

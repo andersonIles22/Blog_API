@@ -2,7 +2,8 @@ const {error}=require('../middleware/errorHandler');
 const db=require('../config/database');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
 const {MESSAGES_OPERATION}=require('../constants/statusMessages');
-const {VALIDATION_VALUES}=require('../constants/values_validations')
+const {VALIDATION_VALUES}=require('../constants/values_validations');
+const { matchedData } = require('express-validator');
 
 
 
@@ -44,9 +45,8 @@ const getPostById=async (req,res,next) => {
 }
 const getAllPost=async(req,res,next)=>{
     try {
-        const {page,limit}=req.query;
+        const {page,limit}=matchedData(req);
         console.log(page,limit)
-        console.log(req.query)
         const offset=(page-1)*limit;
         
         const queryGetAllPost= await db.query(

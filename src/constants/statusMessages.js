@@ -14,7 +14,8 @@ const MESSAGES_OPERATION= Object.freeze({
     URL_NO_FOUND:(url)=>`Path: ${url}, no Found`,
     NOT_AUTHENTICATED:"No Authenticated",
     DENIED_ACCESS:"Access Denied. Insufficient Permissions",
-    NOT_IS_AUTHOR:"You do not have permissions to edit this post"
+    NOT_IS_AUTHOR:"You do not have permissions to edit this post",
+    NUMBER_PAGE_NOT_FOUND:"Number Page is not found"
 });
 
 module.exports={

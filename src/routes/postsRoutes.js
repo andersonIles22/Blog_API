@@ -1,7 +1,7 @@
 const express=require('express');
 const postControllers=require('../controllers/postsController');
 const { authMiddleware } = require('../middleware/auth');
-const { validateIdPost,validatePost,validateUpdate} = require('../middleware/validationInputs');
+const { validateIdPost,validatePost,validateUpdate,validateQueryGetPosts} = require('../middleware/validationInputs');
 const commentRoutes=require('../routes/commentRoutes')
 
 const router=express.Router();
@@ -9,7 +9,7 @@ const router=express.Router();
 
 router.post('/',authMiddleware,validatePost,postControllers.createPost);
 
-router.get('/',postControllers.getAllPost)
+router.get('/',validateQueryGetPosts,postControllers.getAllPost)
 
 router.patch('/:post_id',authMiddleware,validateUpdate,postControllers.updatePost)
 

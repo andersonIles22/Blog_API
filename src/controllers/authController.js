@@ -48,7 +48,6 @@ const register=async (req,res,next)=>{
 const login= async (req,res,next)=>{
     try {
         const {email,password}=req.body;
-        console.log(email,password);
         
         //Comprobamos de que usuario exista
         const queryGetData= await db.query(

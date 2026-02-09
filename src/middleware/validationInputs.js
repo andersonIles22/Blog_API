@@ -1,7 +1,8 @@
-const {body,param,validationResult}=require('express-validator');
+const {body,param,query,validationResult}=require('express-validator');
 const {VALIDATION_VALUES}=require('../constants/values_validations');
 const {MESSAGES_VALIDATION}=require('../constants/messagesValidation');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
+const { Query } = require('pg');
 
 const validateRegister=[
     body('email')
@@ -162,8 +163,30 @@ const validateCommentPost=[
         .isLength({min:VALIDATION_VALUES.MIN_LENGTH_COMMENT,max:VALIDATION_VALUES.MAX_LENGTH_COMMENT})
             .withMessage(MESSAGES_VALIDATION.COMMENT_LIMIT_CHARACTERS),
     (req,res,next)=>{
-        console.log("entro al validatecommentPost")
         const errors=validationResult(req);
+        if(!errors.isEmpty())return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            success: false,
+            errors:errors.array().map(err=>({
+                field:err.path,
+                message:err.msg
+            }))
+        });
+        next();
+    }
+]
+
+
+const validateQueryGetPosts=[
+    query('page')
+        .trim()
+        .isInt({min:VALIDATION_VALUES.MIN_VALUE_QUERY_PAGE})
+            .withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER),
+    Query('limit')
+        .trim()
+        .isInt({min:VALIDATION_VALUES.MIN_VALUE_QUERY_LIMIT,max:VALIDATION_VALUES.MAX_VALUE_QUERY_LIMIT})
+            .withMessage(MESSAGES_VALIDATION.QUERY_LIMIT_MUST_BE),
+    (req,res,next)=>{
+         const errors=validationResult(req);
         if(!errors.isEmpty())return res.status(HTTP_STATUS.BAD_REQUEST).json({
             success: false,
             errors:errors.array().map(err=>({
@@ -181,5 +204,6 @@ module.exports={
     validatePost,
     validateIdPost,
     validateCommentPost,
-    validateUpdate
+    validateUpdate,
+    validateQueryGetPosts
 };

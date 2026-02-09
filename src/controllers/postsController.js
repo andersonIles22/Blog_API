@@ -1,7 +1,8 @@
 const {error}=require('../middleware/errorHandler');
 const db=require('../config/database');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
-const {MESSAGES_OPERATION}=require('../constants/statusMessages')
+const {MESSAGES_OPERATION}=require('../constants/statusMessages');
+const {VALIDATION_VALUES}=require('../constants/values_validations')
 
 
 
@@ -27,8 +28,6 @@ const createPost=async(req,res,next)=>{
 const getPostById=async (req,res,next) => {
     try {
         const id=parseInt(req.params.post_id);
-        console.log(id)
-        console.log(req.params)
         const queryGetById= await db.query(
             `SELECT * FROM posts WHERE id=$1`,
             [id]
@@ -45,7 +44,19 @@ const getPostById=async (req,res,next) => {
 }
 const getAllPost=async(req,res,next)=>{
     try {
-        const queryGetPost=await db.query(
+        const {page,limit}=req.query;
+        const p=parseInt(page)||VALIDATION_VALUES.DEFAULT_VALUE_QUERY_PAGE;
+        const l=parseInt(limit)||VALIDATION_VALUES.DEFAULT_VALUE_QUERY_LIMIT;
+        const offset=(p-1)*l;
+        
+        const queryGetAllPost= await db.query(
+            `SELECT COUNT(*) FROM posts`
+        )
+        const numberOfPages=Math.ceil(queryGetAllPost.rows.length/l);
+        if(p>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
+
+
+        const queryGetPostLimited=await db.query(
             `SELECT 
                 p.*,
                 u.name,
@@ -54,13 +65,22 @@ const getAllPost=async(req,res,next)=>{
             ON p.author_id=u.id
             WHERE p.published=true
             ORDER BY p.created_at DESC
-            `
+            LIMIT $1 OFFSET $2
+            `,
+            [l,offset]
         );
+
+
         res.status(HTTP_STATUS.OK).json({
             success:true,
             message:"Get data successfully",
-            count:queryGetPost.rows.length,
-            data:queryGetPost.rows
+            pagination:{
+                totalPosts:queryGetAllPost.rows.length,
+                totalPages:numberOfPages,
+                currentPage:p,
+                pageSize:l
+            },
+            data:queryGetPostLimited.rows
         });
     } catch (error) {
         next(error);

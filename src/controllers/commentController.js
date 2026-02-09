@@ -34,13 +34,19 @@ const postsComment= async(req,res,next)=>{
 const getPostcomments=async (req,res,next) => {
     try {
         const post_id=parseInt(req.params.post_id);
+        const {page,limit}=req.query;
+        const p=parseInt(page)||VALIDATION_VALUES.DEFAULT_VALUE_QUERY_PAGE;
+        const l=parseInt(limit)||VALIDATION_VALUES.DEFAULT_VALUE_QUERY_LIMIT;
+        const offset=(p-1)*l;
+
+
         //Se establece si el post existe antes de obtener los comentarios del post
         const queryGetPost= await db.query(
             `SELECT * FROM posts WHERE id=$1`,
             [post_id]
         );
         if(!queryGetPost.rows[0]) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND,next);
-
+        
 
         const queryGetCommentsOnPost=await db.query(
             `SELECT 
@@ -52,10 +58,13 @@ const getPostcomments=async (req,res,next) => {
             ON u.id=com.author_id
             WHERE com.post_id=$1
             ORDER BY com.created_at
+            LIMIT $2 OFFSET $3
             `,
-            [post_id]
+            [post_id,l,offset]
         );
         const comments=queryGetCommentsOnPost.rows;
+        const numberOfPages=Math.ceil(comments.length/l);
+        if(p>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
         res.status(HTTP_STATUS.OK).json({
             success:true,

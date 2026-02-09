@@ -61,7 +61,7 @@ const getPostcomments=async (req,res,next) => {
             [post_id,limit,offset]
         );
         const comments=queryGetCommentsOnPost.rows;
-        const numberOfPages=Math.ceil(comments.length/l);
+        const numberOfPages=Math.ceil(comments.length/limit);
         if(p>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
         res.status(HTTP_STATUS.OK).json({

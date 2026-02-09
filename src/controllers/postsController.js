@@ -46,6 +46,7 @@ const getAllPost=async(req,res,next)=>{
     try {
         const {page,limit}=req.query;
         console.log(page,limit)
+        console.log(req.query)
         const offset=(page-1)*limit;
         
         const queryGetAllPost= await db.query(

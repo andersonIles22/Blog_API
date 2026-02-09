@@ -2,7 +2,6 @@ const {error}=require('../middleware/errorHandler');
 const db=require('../config/database');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
 const {MESSAGES_OPERATION}=require('../constants/statusMessages');
-const {VALIDATION_VALUES}=require('../constants/values_validations');
 const { matchedData } = require('express-validator');
 
 

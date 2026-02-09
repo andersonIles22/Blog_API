@@ -6,7 +6,7 @@ const commentControllers=require('../controllers/commentController');
 
 const router=express.Router({mergeParams:true});
 
-router.post('/',authMiddleware,validateIdPost,validateCommentPost,commentControllers.postsComment);
+router.post('/',authMiddleware,validateIdPost,validateQueryGetPosts,commentControllers.postsComment);
 
 router.get('/',validateIdPost,validateQueryGetPosts,commentControllers.getPostcomments)
 

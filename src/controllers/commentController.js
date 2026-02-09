@@ -35,9 +35,7 @@ const getPostcomments=async (req,res,next) => {
     try {
         const post_id=parseInt(req.params.post_id);
         const {page,limit}=req.query;
-        const p=parseInt(page)||VALIDATION_VALUES.DEFAULT_VALUE_QUERY_PAGE;
-        const l=parseInt(limit)||VALIDATION_VALUES.DEFAULT_VALUE_QUERY_LIMIT;
-        const offset=(p-1)*l;
+        const offset=(page-1)*limit;
 
 
         //Se establece si el post existe antes de obtener los comentarios del post
@@ -60,7 +58,7 @@ const getPostcomments=async (req,res,next) => {
             ORDER BY com.created_at
             LIMIT $2 OFFSET $3
             `,
-            [post_id,l,offset]
+            [post_id,limit,offset]
         );
         const comments=queryGetCommentsOnPost.rows;
         const numberOfPages=Math.ceil(comments.length/l);
@@ -68,7 +66,12 @@ const getPostcomments=async (req,res,next) => {
 
         res.status(HTTP_STATUS.OK).json({
             success:true,
-            countComments:comments.length,
+            pagination:{
+                totalComments:comments.length,
+                totalPages:numberOfPages,
+                currentPage:page,
+                pageSize:limit
+            },
             data:{
                 comments
             }

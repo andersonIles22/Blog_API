@@ -45,15 +45,13 @@ const getPostById=async (req,res,next) => {
 const getAllPost=async(req,res,next)=>{
     try {
         const {page,limit}=req.query;
-        const p=parseInt(page)||VALIDATION_VALUES.DEFAULT_VALUE_QUERY_PAGE;
-        const l=parseInt(limit)||VALIDATION_VALUES.DEFAULT_VALUE_QUERY_LIMIT;
-        const offset=(p-1)*l;
+        const offset=(page-1)*limit;
         
         const queryGetAllPost= await db.query(
             `SELECT COUNT(*) FROM posts`
         )
         const numberOfPages=Math.ceil(queryGetAllPost.rows.length/l);
-        if(p>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
+        if(page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
 
         const queryGetPostLimited=await db.query(
@@ -67,7 +65,7 @@ const getAllPost=async(req,res,next)=>{
             ORDER BY p.created_at DESC
             LIMIT $1 OFFSET $2
             `,
-            [l,offset]
+            [limit,offset]
         );
 
 
@@ -77,8 +75,8 @@ const getAllPost=async(req,res,next)=>{
             pagination:{
                 totalPosts:queryGetAllPost.rows.length,
                 totalPages:numberOfPages,
-                currentPage:p,
-                pageSize:l
+                currentPage:page,
+                pageSize:limit
             },
             data:queryGetPostLimited.rows
         });

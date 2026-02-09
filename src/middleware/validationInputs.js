@@ -178,11 +178,13 @@ const validateCommentPost=[
 
 const validateQueryGetPosts=[
     query('page')
-        .trim()
+        .default(VALIDATION_VALUES.DEFAULT_VALUE_QUERY_PAGE)
+        .toInt()
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_QUERY_PAGE})
             .withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER),
     query('limit')
-        .trim()
+        .default(VALIDATION_VALUES.DEFAULT_VALUE_QUERY_LIMIT)
+        .toInt()
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_QUERY_LIMIT,max:VALIDATION_VALUES.MAX_VALUE_QUERY_LIMIT})
             .withMessage(MESSAGES_VALIDATION.QUERY_LIMIT_MUST_BE),
     (req,res,next)=>{

@@ -51,8 +51,8 @@ const getAllPost=async(req,res,next)=>{
         const queryGetAllPost= await db.query(
             `SELECT COUNT(*) FROM posts`
         )
-        console.log(queryGetAllPost.rows[0].count)
-        const numberOfPages=Math.ceil(queryGetAllPost.rows.count/limit);
+        const numberOfPosts=queryGetAllPost.rows[0].count;
+        const numberOfPages=Math.ceil(numberOfPosts/limit);
         if(page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
 
@@ -75,7 +75,7 @@ const getAllPost=async(req,res,next)=>{
             success:true,
             message:"Get data successfully",
             pagination:{
-                totalPosts:queryGetAllPost.rows.count,
+                totalPosts:numberOfPosts,
                 totalPages:numberOfPages,
                 currentPage:page,
                 pageSize:limit

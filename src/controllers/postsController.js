@@ -45,6 +45,7 @@ const getPostById=async (req,res,next) => {
 const getAllPost=async(req,res,next)=>{
     try {
         const {page,limit}=req.query;
+        console.log(page,limit)
         const offset=(page-1)*limit;
         
         const queryGetAllPost= await db.query(

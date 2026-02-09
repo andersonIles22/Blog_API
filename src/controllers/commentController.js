@@ -46,8 +46,17 @@ const getPostcomments=async (req,res,next) => {
         );
         if(!queryGetPost.rows[0]) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND,next);
         
+        const queryGetAllCommentsOnPost=await db.query(
+            `SELECT count(*) FROM users u JOIN comments com
+            ON u.id=com.author_id
+            WHERE com.post_id=$1`,
+            [post_id]
+        )
+        const numberAllComments=queryGetAllCommentsOnPost.rows.length
+        const numberOfPages=Math.ceil(numberAllComments/limit);
+        if(page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
-        const queryGetCommentsOnPost=await db.query(
+        const queryGetSomeCommentsOnPost=await db.query(
             `SELECT 
                 u.id,
                 u.name,
@@ -61,14 +70,12 @@ const getPostcomments=async (req,res,next) => {
             `,
             [post_id,limit,offset]
         );
-        const comments=queryGetCommentsOnPost.rows;
-        const numberOfPages=Math.ceil(comments.length/limit);
-        if(page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
+        const comments=queryGetSomeCommentsOnPost.rows;
 
         res.status(HTTP_STATUS.OK).json({
             success:true,
             pagination:{
-                totalComments:comments.length,
+                totalComments:numberAllComments,
                 totalPages:numberOfPages,
                 currentPage:page,
                 pageSize:limit

@@ -55,7 +55,7 @@ const getAllPost=async(req,res,next)=>{
         ON u.id=p.author_id`;
 
         const {page,limit,author,published}=matchedData(req);
-        console.log(author,published);
+        console.log(matchedData(req));
         const offset=(page-1)*limit;
         
         const queryGetAllPost= await db.query(

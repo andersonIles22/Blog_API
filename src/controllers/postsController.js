@@ -44,7 +44,18 @@ const getPostById=async (req,res,next) => {
 }
 const getAllPost=async(req,res,next)=>{
     try {
-        const {page,limit}=matchedData(req);
+        const conditionArr=[];
+        const valuesArr=[];
+        const baseQuery=
+        `SELECT 
+            p.*,
+            u.name,
+            u.email
+        FROM users u JOIN posts p
+        ON u.id=p.author_id`;
+
+        const {page,limit,author,published}=matchedData(req);
+        console.log(author,published);
         const offset=(page-1)*limit;
         
         const queryGetAllPost= await db.query(

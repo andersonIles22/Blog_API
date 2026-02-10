@@ -16,7 +16,8 @@ const MESSAGES_VALIDATION=({
     TITLE_POST_IS_EMPTY:"Title is required",
     CONTENT_POST_IS_EMPTY:"Content is required",
     COMMENT_LIMIT_CHARACTERS:"Comment should be between 3 to 500 characters",
-    QUERY_LIMIT_MUST_BE:"Query Value should be between 1 to 100"
+    QUERY_LIMIT_MUST_BE:"Query Value should be between 1 to 100",
+    QUERY_PUBLISHED_MUST_BE_BOOLEAN:"Published value should be boolean"
 });
 module.exports={
     MESSAGES_VALIDATION

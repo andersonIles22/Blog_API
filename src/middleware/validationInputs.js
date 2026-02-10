@@ -187,6 +187,11 @@ const validateQueryGetPosts=[
         .toInt()
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_QUERY_LIMIT,max:VALIDATION_VALUES.MAX_VALUE_QUERY_LIMIT})
             .withMessage(MESSAGES_VALIDATION.QUERY_LIMIT_MUST_BE),
+    query('author')
+        .optional(),
+    query('published')
+        .optional()
+        .isIn(true,false),
     (req,res,next)=>{
          const errors=validationResult(req);
         if(!errors.isEmpty())return res.status(HTTP_STATUS.BAD_REQUEST).json({

@@ -125,6 +125,7 @@ const updatePost=async (req,res,next) => {
         const queryGetPosts= await db.query(
             `SELECT * FROM posts WHERE author_id=$1`,[id]
         );
+        console.log(queryGetPosts)
         const countPosts=queryGetPosts.rows.length;
         if(!countPosts>0) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND,next);
 

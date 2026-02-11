@@ -132,7 +132,7 @@ const updatePost=async (req,res,next) => {
             `UPDATE posts
             SET title=COALESCE($1,title), content=COALESCE($2,content)
             WHERE id=$3 AND author_id=$4
-            RETURNING *`
+            RETURNING *`,
             [title,content,post_id,id]
         );
 

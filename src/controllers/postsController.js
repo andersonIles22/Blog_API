@@ -54,10 +54,10 @@ const getAllPost=async(req,res,next)=>{
         FROM users u JOIN posts p
         ON u.id=p.author_id`;
 
-        const {page,limit,author,published}=matchedData(req);
-    
-        if(author){
-            valuesArr.push(author)
+        const {page,limit,author_id,published}=matchedData(req);
+        // Validamos que los parametros existan y asi establecer las condicionales en caso de indicar en la ruta
+        if(author_id){
+            valuesArr.push(author_id)
             let number=valuesArr.length
             conditionArr.push(`p.author_id=$${number}`)
         }
@@ -77,6 +77,12 @@ const getAllPost=async(req,res,next)=>{
         const queryGetAllPost= await db.query(
             finalQueryAllPost, valuesArr
         )
+        const numberOfPosts=queryGetAllPost.rows[0].count;
+        const numberOfPages=Math.ceil(numberOfPosts/limit);
+        if(numberOfPosts>0 && page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
+
+
+        // LIMIT y OFFSET al final para evitar problemas con el conteo de posts aplicando o no los filtros
         let limitePage="";
         const offset=(page-1)*limit;
         if(limit && page){
@@ -87,12 +93,7 @@ const getAllPost=async(req,res,next)=>{
 
         let resultQuery=`${baseQuery} ${whereConditions} ORDER BY p.created_at DESC ${limitePage}`;
 
-
-        const numberOfPosts=queryGetAllPost.rows[0].count;
-        const numberOfPages=Math.ceil(numberOfPosts/limit);
-        if(page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
-
-
+        // Consulta con todos los parametros establecidos en la query de la ruta
         const queryGetPostLimited=await db.query(
             resultQuery,valuesArr
         );

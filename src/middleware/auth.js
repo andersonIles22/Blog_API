@@ -27,7 +27,7 @@ const authMiddleware= (req,res,next)=>{
  * @param  {string[]} allowedRoles - Los roles permitidos
  * @returns 
  */
-const isOwnerOrRole=(tableName,fieldAuthor,...allowedRoles)=>{
+const isOwnerOrRole=(tableName,fieldAuthor,[...allowedRoles])=>{
     return async (req,res,next)=>{
         const {id,role}=req.user;
         const resourceId=req.params.post_id;

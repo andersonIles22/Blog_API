@@ -34,12 +34,15 @@ const isOwnerOrRole=(tableName,fieldAuthor,...allowedRoles)=>{
 
         if(allowedRoles.includes(role)) return next();
         
+        const query=`
+            SELECT ${fieldAuthor} FROM ${tableName}
+            WHERE id=$1
+        `;
         const queryGetResource= await db.query(
-            `SELECT $1 FROM $2 
-            WHERE id=$3`,
-            [fieldAuthor,tableName,resourceId]
+            query,
+            [resourceId]
         );
-        const idObtained=queryGetResource.rows[0].fieldAuthor;
+        const idObtained=queryGetResource.rows[0][fieldAuthor];
 
         if(idObtained===id) return next();
 

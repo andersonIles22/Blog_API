@@ -55,29 +55,46 @@ const getAllPost=async(req,res,next)=>{
         ON u.id=p.author_id`;
 
         const {page,limit,author,published}=matchedData(req);
-        console.log(matchedData(req));
-        const offset=(page-1)*limit;
-        
+    
+        if(author){
+            valuesArr.push(author)
+            let number=valuesArr.length
+            conditionArr.push(`p.author_id=$${number}`)
+        }
+        if(published){
+            valuesArr.push(published)
+            let number=valuesArr.length
+            conditionArr.push(`p.published=$${number}`)
+        }
+
+        let whereConditions=conditionArr.join(` AND `)
+        if(conditionArr.length>0){
+            whereConditions=` WHERE ${whereConditions}`
+        }
+        // Se establece una consulta a la db para obtener el numero total 
+        // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET
+        let finalQueryAllPost= `SELECT COUNT(*) FROM posts p ${whereConditions}`
         const queryGetAllPost= await db.query(
-            `SELECT COUNT(*) FROM posts`
+            finalQueryAllPost, valuesArr
         )
+        let limitePage="";
+        const offset=(page-1)*limit;
+        if(limit && page){
+            valuesArr.push(limit,offset)
+            let number=valuesArr.length
+            limitePage=`LIMIT $${number-1} OFFSET $${number}`
+        }
+
+        let resultQuery=`${baseQuery} ${whereConditions} ORDER BY p.created_at DESC ${limitePage}`;
+
+
         const numberOfPosts=queryGetAllPost.rows[0].count;
         const numberOfPages=Math.ceil(numberOfPosts/limit);
         if(page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
 
         const queryGetPostLimited=await db.query(
-            `SELECT 
-                p.*,
-                u.name,
-                u.email
-            FROM posts p JOIN users u
-            ON p.author_id=u.id
-            WHERE p.published=true
-            ORDER BY p.created_at DESC
-            LIMIT $1 OFFSET $2
-            `,
-            [limit,offset]
+            resultQuery,valuesArr
         );
 
 

@@ -133,7 +133,19 @@ const validateUpdate=[
             .withMessage(MESSAGES_VALIDATION.CONTENT_POST_IS_EMPTY)
         .isLength({min:VALIDATION_VALUES.MIN_LENGTH_CONTENT_POST})
             .withMessage(MESSAGES_VALIDATION.CONTENT_POSTS_MIN_CHARACTERS),
-    
+    (req,res,next)=>{
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                success: false,
+                errors:errors.array().map(err=>({
+                    field:err.path,
+                    message:err.msg
+                 }))
+            })
+        }
+        next();
+    }
 ];
 
 const validateIdPost=[

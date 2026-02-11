@@ -51,7 +51,7 @@ const login= async (req,res,next)=>{
         
         //Comprobamos de que usuario exista
         const queryGetData= await db.query(
-            `SELECT id,email, password FROM users WHERE email=$1`,
+            `SELECT id,email, password,role FROM users WHERE email=$1`,
             [email]
         );
         const user=queryGetData.rows[0];

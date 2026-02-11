@@ -32,6 +32,7 @@ const isOwnerOrRole=(tableName,fieldAuthor,...allowedRoles)=>{
         const {id,role}=req.user;
         const resourceId=req.params.post_id;
         console.log(role)
+        console.log (allowedRoles)
 
         if(allowedRoles.includes(role)) return next();
         

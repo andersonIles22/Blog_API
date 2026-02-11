@@ -2,6 +2,7 @@ const jwt=require('jsonwebtoken');
 const { error } = require('./errorHandler');
 const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
+const db=require('../config/database');
 
 const authMiddleware= (req,res,next)=>{
     const getAuth=req.headers.authorization;
@@ -19,4 +20,34 @@ const authMiddleware= (req,res,next)=>{
     }
 };
 
-module.exports={authMiddleware}
+/**
+ * Permite comprobar si es el propietario o de rol admin
+ * @param {string} tableName - Nombre de la tabla que se va a buscar el id del propietario en la base de datos
+ * @param {string} fieldAuthor - Nombre del campo que contiene el id a buscar
+ * @param  {string[]} allowedRoles - Los roles permitidos
+ * @returns 
+ */
+const isOwnerOrRole=(tableName,fieldAuthor,...allowedRoles)=>{
+    return async (req,res,next)=>{
+        const {id,role}=req.user;
+        const resourceId=req.params.post_id;
+
+        if(allowedRoles.includes(role)) return next();
+        
+        const queryGetResource= await db.query(
+            `SELECT $1 FROM $2 
+            WHERE id=$3`,
+            [fieldAuthor,tableName,resourceId]
+        );
+        const idObtained=queryGetResource.rows[0].fieldAuthor;
+
+        if(idObtained===id) return next();
+
+        return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.DENIED_ACCESS);
+    };
+};
+
+module.exports={
+    authMiddleware,
+    isOwnerOrRole
+ }

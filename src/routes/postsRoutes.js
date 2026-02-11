@@ -1,6 +1,6 @@
 const express=require('express');
 const postControllers=require('../controllers/postsController');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware,isOwnerOrRole } = require('../middleware/auth');
 const { validateIdPost,validatePost,validateUpdate,validateQueryGetPosts} = require('../middleware/validationInputs');
 const commentRoutes=require('../routes/commentRoutes')
 
@@ -11,7 +11,7 @@ router.post('/',authMiddleware,validatePost,postControllers.createPost);
 
 router.get('/',validateQueryGetPosts,postControllers.getAllPost)
 
-router.patch('/:post_id',authMiddleware,validateUpdate,postControllers.updatePost)
+router.patch('/:post_id',authMiddleware,isOwnerOrRole('posts','author_id',['admin']),validateUpdate,postControllers.updatePost)
 
 router.get('/:post_id',validateIdPost,postControllers.getPostById)
 

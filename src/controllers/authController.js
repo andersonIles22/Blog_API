@@ -66,7 +66,7 @@ const login= async (req,res,next)=>{
         //Generación de Access token
 
         const accesstoken=jwt.sign(
-            {id:user.id,gmail:user.email},
+            {id:user.id,gmail:user.email,role:user.role},
             process.env.JWT_SECRET,
             {expiresIn:process.env.JWT_EXPIRES_IN||'15m'}
         )

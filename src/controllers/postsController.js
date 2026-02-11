@@ -123,9 +123,8 @@ const updatePost=async (req,res,next) => {
 
         //Verificamos si el post existe 
         const queryGetPosts= await db.query(
-            `SELECT * FROM posts WHERE author_id=$1`,[id]
+            `SELECT * FROM posts WHERE id=$1`,[post_id]
         );
-        console.log(queryGetPosts)
         const countPosts=queryGetPosts.rows.length;
         if(!countPosts>0) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND,next);
 

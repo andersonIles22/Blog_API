@@ -46,7 +46,7 @@ const isOwnerOrRole=(tableName,fieldAuthor,...allowedRoles)=>{
 
         if(idObtained===id) return next();
 
-        return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.DENIED_ACCESS);
+        return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.DENIED_ACCESS,next);
     };
 };
 

@@ -139,7 +139,12 @@ const updatePost=async (req,res,next) => {
 
         if(queryUpdatePost.rowCount===0) return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.NOT_IS_AUTHOR,next);
 
-        res.status(HTTP_STATUS.OK,MESSAGES_OPERATION.SUCCESFUL_OPERATION);
+        res.status(HTTP_STATUS.OK).json(
+        {
+            success:true,
+            message:MESSAGES_OPERATION.SUCCESFUL_OPERATION
+        }
+        );
 
     } catch (error) {
         next(error)

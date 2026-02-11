@@ -121,17 +121,26 @@ const updatePost=async (req,res,next) => {
         const {post_id}=req.params;
         const {title,content}=req.body;
 
+        //Verificamos si el post existe 
+        const queryGetPosts= await db.query(
+            `SELECT * FROM posts WHERE author_id=$1`,[id]
+        );
+        const countPosts=queryGetPosts.rows.length;
+        if(!countPosts>0) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND,next);
+
         const queryUpdatePost= await db.query(
             `UPDATE posts
             SET title=COALESCE($1,title), content=COALESCE($2,content)
             WHERE id=$3 AND author_id=$4
             RETURNING *`
             [title,content,post_id,id]
-        )
+        );
+
 
         if(queryUpdatePost.rowCount===0) return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.NOT_IS_AUTHOR,next);
 
-        res.status(HTTP_STATUS.OK,MESSAGES_OPERATION.SUCCESFUL_OPERATION)
+        res.status(HTTP_STATUS.OK,MESSAGES_OPERATION.SUCCESFUL_OPERATION);
+
     } catch (error) {
         next(error)
     }

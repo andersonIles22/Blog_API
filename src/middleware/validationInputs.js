@@ -190,10 +190,11 @@ const validateQueryGetPosts=[
     query('author_id')
         .optional()
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_QUERY_PAGE})
-        .withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER),
+            .withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER),
     query('published')
         .optional()
-        .isIn('true','false').withMessage(MESSAGES_VALIDATION.QUERY_PUBLISHED_MUST_BE_BOOLEAN),
+        .isIn(['true','false'])
+            .withMessage(MESSAGES_VALIDATION.QUERY_PUBLISHED_MUST_BE_BOOLEAN),
     (req,res,next)=>{
          const errors=validationResult(req);
         if(!errors.isEmpty())return res.status(HTTP_STATUS.BAD_REQUEST).json({

@@ -117,7 +117,6 @@ const getAllPost=async(req,res,next)=>{
 
 const updatePost=async (req,res,next) => {
     try {
-        const {id,role}=req.user;
         const {post_id}=req.params;
         const {title,content}=req.body;
 
@@ -128,18 +127,11 @@ const updatePost=async (req,res,next) => {
         const countPosts=queryGetPosts.rows.length;
         if(!countPosts>0) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND,next);
 
-        // Estructuramos la consulta a la base de datos dependiendo de si es admin o el propietario
-        const queryBase=`UPDATE posts
-            SET title=COALESCE($1,title), content=COALESCE($2,content)`;
-
-        const whereClause=(role==='admin')? `WHERE id=$3 RETURNING *`:`WHERE id=$3 AND author_id=$4 RETURNING *`;
-        const valuesQueries=(role=='admin')?[title,content,post_id]:[title,content,post_id,id];
-
-        const queryResult=`${queryBase} ${whereClause}`;
-
         const queryUpdatePost= await db.query(
-            queryResult,
-            valuesQueries
+            `UPDATE posts
+            SET title=COALESCE($1,title), content=COALESCE($2,content)
+            WHERE id=$3`,
+            [title,content,post_id]
         );
 
         res.status(HTTP_STATUS.OK).json(

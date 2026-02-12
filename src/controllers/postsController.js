@@ -185,5 +185,6 @@ module.exports={
     createPost,
     getPostById,
     getAllPost,
-    updatePost
+    updatePost,
+    deletePost
 }

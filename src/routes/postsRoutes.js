@@ -13,6 +13,8 @@ router.get('/',validateQueryGetPosts,postControllers.getAllPost)
 
 router.patch('/:post_id',authMiddleware,isOwnerOrRole('posts','author_id',['admin']),validateUpdate,postControllers.updatePost)
 
+router.delete('/:post_id',authMiddleware,isOwnerOrRole('posts','author_id',['admin']),postControllers.deletePost)
+
 router.get('/:post_id',validateIdPost,postControllers.getPostById)
 
 router.use('/:post_id/comments',commentRoutes);

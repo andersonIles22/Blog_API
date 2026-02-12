@@ -132,13 +132,14 @@ const updatePost=async (req,res,next) => {
         const queryBase=`UPDATE posts
             SET title=COALESCE($1,title), content=COALESCE($2,content)`;
 
-        const whereClause=(role==='admin')? `WHERE id=$3 RETURNING *`:`WHERE id=$3 AND author_id=$4 RETURNING *`
-        
+        const whereClause=(role==='admin')? `WHERE id=$3 RETURNING *`:`WHERE id=$3 AND author_id=$4 RETURNING *`;
+        const valuesQueries=(role=='admin')?[title,content,post_id]:[title,content,post_id,id];
+
         const queryResult=`${queryBase} ${whereClause}`;
 
         const queryUpdatePost= await db.query(
             queryResult,
-            [title,content,post_id,id]
+            valuesQueries
         );
 
         res.status(HTTP_STATUS.OK).json(

@@ -117,7 +117,7 @@ const getAllPost=async(req,res,next)=>{
 
 const updatePost=async (req,res,next) => {
     try {
-        const {id}=req.user;
+        const {id,role}=req.user;
         const {post_id}=req.params;
         const {title,content}=req.body;
 

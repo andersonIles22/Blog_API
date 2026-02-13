@@ -62,7 +62,7 @@ const isOwnerOrRole=(resourceType, allowedRoles = [])=>{
             [resourceId]
         );
 
-        if (result.rows.length === 0) {
+        if (queryGetResource.rows.length === 0) {
             return error(HTTP_STATUS.NOT_FOUND,`${resourceType.slice(0, -1)} not found`,next);
         }
         

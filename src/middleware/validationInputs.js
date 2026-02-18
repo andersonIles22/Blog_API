@@ -2,7 +2,7 @@ const {body,param,query,validationResult}=require('express-validator');
 const {VALIDATION_VALUES}=require('../constants/values_validations');
 const {MESSAGES_VALIDATION}=require('../constants/messagesValidation');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
-const { Query } = require('pg');
+const db = require('../config/database');
 
 const validateRegister=[
     body('email')
@@ -101,6 +101,28 @@ const validatePost=[
             .withMessage(MESSAGES_VALIDATION.COMMENT_IS_EMPTY)
         .isLength({min:VALIDATION_VALUES.MIN_LENGTH_CONTENT_POST})
             .withMessage(MESSAGES_VALIDATION.CONTENT_POSTS_MIN_CHARACTERS),
+    body('category_ids')
+        .optional()
+        .isArray()
+            .withMessage(MESSAGES_VALIDATION.CATEGORY_POST_MUST_BE_AN_ARRAY)
+        .bail()
+        .custom((vector) => {
+        if (vector.length > VALIDATION_VALUES.MAX_LENGTH_CATEGORY_IDS) {
+            throw new Error(`There can not be more than ${VALIDATION_VALUES.MAX_LENGTH_CATEGORY_IDS} categories`);
+        }
+        const uniqueIds=[...new Set(vector)];
+        if(uniqueIds.length!==vector.length){
+            throw new Error(`Duplicate category IDs are not allowed in the same post`);
+        }
+        return true; 
+    }),,
+    body('category_ids.*')
+        .isInt({min:VALIDATION_VALUES.MIN_VALUE_CATEGORY_IDs})
+            .withMessage(MESSAGES_VALIDATION.CATEGORY_VALUES_MUST_BE_INTEGERS_POSITIVE),
+
+    body('published')
+        .isBoolean()
+            .withMessage(MESSAGES_VALIDATION.PUBLISHED_VALUE_MUST_BE_BOOLEAN), 
     (req,res,next)=>{
         const errors=validationResult(req);
         if(!errors.isEmpty()){

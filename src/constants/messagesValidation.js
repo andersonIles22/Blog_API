@@ -15,6 +15,13 @@ const MESSAGES_VALIDATION=({
     COMMENT_IS_EMPTY:"Comment is required",
     TITLE_POST_IS_EMPTY:"Title is required",
     CONTENT_POST_IS_EMPTY:"Content is required",
+    CATEGORY_POST_IS_EMPTY:"Category_ids are required",
+    CATEGORY_POST_MUST_BE_AN_ARRAY:"Category_ids must be an Array",
+    CATEGORY_POST_MUST_BE_ARRAY_AND_MIN_ONE_ELEMENT:"It must be an array, with at least one category",
+    CATEGORY_VALUES_MUST_BE_INTEGERS_POSITIVE:"Category_ids values must be positive integers greater than 1",
+    CATEGORY_LENGTH_BETWEEN:"Category_ids length must be between 1 and 50",
+    CATEGORY_VALUES_MUST_BE_EXISTS:"Category_ids is required",
+    PUBLISHED_VALUE_MUST_BE_BOOLEAN:"Published values must be a boolean",
     COMMENT_LIMIT_CHARACTERS:"Comment should be between 3 to 500 characters",
     QUERY_LIMIT_MUST_BE:"Query Value should be between 1 to 100",
     QUERY_PUBLISHED_MUST_BE_BOOLEAN:"Published value should be boolean"

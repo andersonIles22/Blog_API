@@ -7,21 +7,39 @@ const { matchedData } = require('express-validator');
 
 
 const createPost=async(req,res,next)=>{
+    const client=await db.connect();
     try {
-   const {title,content,published}=req.body;
+    const {title,content,published,category_ids}=req.body;
     const author_id=req.user.id;
+ 
+    //Iniciar Transacción
 
-    const queryPost=await db.query(
-        `INSERT INTO  posts (title, content, author_id, published) VALUES($1,$2,$3,$4) RETURNING *`,
+    await client.query('BEGIN');
+    const insertPostQuery=`
+    INSERT INTO  posts (title, content, author_id, published)
+     VALUES($1,$2,$3,$4) 
+    RETURNING id`;
+
+    // Consulta Principal
+    const postResult=await client.query(
+        insertPostQuery,
         [title,content,author_id,published||false]
     )
+
+    const postId= postResult.rows[0].id;
+
+    console.log(postId);
     res.status(HTTP_STATUS.CREATED).json({
         success:true,
         message:"Post published successfully",
         data:queryPost.rows[0]
     })
     } catch (error) {
+        await client.query(`ROLLBACK`);
         next(error)
+    }
+    finally{
+        client.release();
     }
 }
 

@@ -17,7 +17,7 @@ const createPost=async(req,res,next)=>{
     await client.query('BEGIN');
     const insertPostQuery=`
     INSERT INTO  posts (title, content, author_id, published)
-     VALUES($1,$2,$3,$4) 
+     VALUES ($1,$2,$3,$4) 
     RETURNING id`;
 
     // Consulta Principal
@@ -40,7 +40,7 @@ const createPost=async(req,res,next)=>{
         valuesInsert.push(category_ids);
 
         const insertCategoryIdsQuery=`
-        INSERT INTO (post_id,category_id)
+        INSERT INTO post_categories (post_id,category_id)
         VALUES ${placeholders}`;
 
         await client.query(insertCategoryIdsQuery,valuesInsert);

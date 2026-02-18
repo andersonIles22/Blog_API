@@ -29,6 +29,7 @@ const createPost=async(req,res,next)=>{
     const postId= postResult.rows[0].id;
 
     console.log(postId);
+    await client.query('COMMIT');
     res.status(HTTP_STATUS.CREATED).json({
         success:true,
         message:"Post published successfully",

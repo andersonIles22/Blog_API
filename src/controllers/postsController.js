@@ -30,11 +30,12 @@ const createPost=async(req,res,next)=>{
 
     if(category_ids.length>0){
 
-        let placeholders=''
+        let placeholders=[];
         for(i=1;i<=category_ids.length;i++){
             let count=i+1
-            placeholders+=`($1,$${count})`
+            placeholders.push(`($1,$${count})`);
         }
+        placeholders.join(',')
 
         let valuesInsert=[postId];
         valuesInsert.push(...category_ids);

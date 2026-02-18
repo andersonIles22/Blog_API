@@ -28,8 +28,28 @@ const createPost=async(req,res,next)=>{
 
     const postId= postResult.rows[0].id;
 
-    console.log(postId);
+    if(category_ids.length>0){
+
+        let placeholders=''
+        for(i=1;i<=arr.length;i++){
+            let count=i+1
+            placeholders+=`($1,$${count})`
+        }
+
+        let valuesInsert=[postId];
+        valuesInsert.push(category_ids);
+
+        const insertCategoryIdsQuery=`
+        INSERT INTO (post_id,category_id)
+        VALUES ${placeholders}`;
+
+        await client.query(insertCategoryIdsQuery,valuesInsert);
+        
+        
+    }
+
     await client.query('COMMIT');
+
     res.status(HTTP_STATUS.CREATED).json({
         success:true,
         message:"Post published successfully",

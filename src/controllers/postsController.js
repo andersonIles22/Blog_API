@@ -32,7 +32,7 @@ const createPost=async(req,res,next)=>{
     res.status(HTTP_STATUS.CREATED).json({
         success:true,
         message:"Post published successfully",
-        data:queryPost.rows[0]
+        data:postResult.rows[0]
     })
     } catch (error) {
         await client.query(`ROLLBACK`);

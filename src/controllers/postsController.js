@@ -31,7 +31,7 @@ const createPost=async(req,res,next)=>{
     if(category_ids.length>0){
 
         let placeholders=''
-        for(i=1;i<=arr.length;i++){
+        for(i=1;i<=category_ids.length;i++){
             let count=i+1
             placeholders+=`($1,$${count})`
         }

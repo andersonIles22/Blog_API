@@ -37,7 +37,7 @@ const createPost=async(req,res,next)=>{
         }
 
         let valuesInsert=[postId];
-        valuesInsert.push(category_ids);
+        valuesInsert.push(...category_ids);
 
         const insertCategoryIdsQuery=`
         INSERT INTO post_categories (post_id,category_id)

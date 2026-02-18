@@ -43,8 +43,8 @@ const createPost=async(req,res,next)=>{
         INSERT INTO post_categories (post_id,category_id)
         VALUES ${placeholders}`;
 
+        console.log(insertCategoryIdsQuery,valuesInsert)
         await client.query(insertCategoryIdsQuery,valuesInsert);
-        
         
     }
 

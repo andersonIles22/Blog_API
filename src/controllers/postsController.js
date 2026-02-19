@@ -52,7 +52,7 @@ const createPost=async(req,res,next)=>{
         message:"Post published successfully",
         data:{
             ...postResult.rows[0],
-            categories:category_ids
+            categories_ids:category_ids
         }
     })
     } catch (error) {
@@ -90,8 +90,9 @@ const getAllPost=async(req,res,next)=>{
             p.*,
             u.name,
             u.email
-        FROM users u JOIN posts p
-        ON u.id=p.author_id`;
+        FROM users u 
+        JOIN posts p ON u.id=p.author_id
+        LEFT JOIN post_categories p_g ON p.id=p_g.post_id`;
 
         const {page,limit,author_id,published}=matchedData(req);
         // Validamos que los parametros existan y asi establecer las condicionales en caso de indicar en la ruta

@@ -119,9 +119,11 @@ const getAllPost=async(req,res,next)=>{
         )
         const numberOfPosts=queryGetAllPost.rows[0].count;
         const numberOfPages=Math.ceil(numberOfPosts/limit);
+        console.log(page, numberOfPages);
+        
         if(numberOfPosts>0 && page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
-
+        
         // LIMIT y OFFSET al final para evitar problemas con el conteo de posts aplicando o no los filtros
         let limitePage="";
         const offset=(page-1)*limit;

@@ -130,18 +130,18 @@ const validatePost=[
         if(!vector || vector.length===0) return true;
         
         const queryDb=`
-        SELECT name FROM categories
-        WHERE name = ANY($1)
+        SELECT id FROM categories
+        WHERE id = ANY($1)
         `;
 
         const getCategoriesQuery= await db.query(queryDb,[vector]);
         // Obtenemos un array de las categorias
-        const arrCategories=getCategoriesQuery.rows.map((value)=> value.name);
+        const arrCategories=getCategoriesQuery.rows.map((value)=> value.id);
         // Lanzamos error si las categorias introducidas no existen en la base de datos
         const result=vector.filter((value)=> !arrCategories.includes(value));
 
         if(result.length>0){
-            throw new Error(`These categories: ${result.join(', ')} do not exist`);
+            throw new Error(`These category ids: ${result.join(', ')} do not exist`);
         }
         
         return true;

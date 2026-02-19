@@ -107,18 +107,45 @@ const validatePost=[
             .withMessage(MESSAGES_VALIDATION.CATEGORY_POST_MUST_BE_AN_ARRAY)
         .bail()
         .custom((vector) => {
+            // Validamos que el numero de categorías no exeda cierta longitud.
         if (vector.length > VALIDATION_VALUES.MAX_LENGTH_CATEGORY_IDS) {
             throw new Error(`There can not be more than ${VALIDATION_VALUES.MAX_LENGTH_CATEGORY_IDS} categories`);
         }
+
+        // Validadmos que los elementos del array no esten repetidos
         const uniqueIds=[...new Set(vector)];
         if(uniqueIds.length!==vector.length){
             throw new Error(`Duplicate category IDs are not allowed in the same post`);
         }
+
+
         return true; 
-    }),,
+        }),
     body('category_ids.*')
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_CATEGORY_IDs})
             .withMessage(MESSAGES_VALIDATION.CATEGORY_VALUES_MUST_BE_INTEGERS_POSITIVE),
+    body('category_ids')
+        .custom(async(vector)=>{
+
+        if(!vector || vector.length===0) return true;
+        
+        const queryDb=`
+        SELECT name FROM categories
+        WHERE name = ANY($1)
+        `;
+
+        const getCategoriesQuery= await db.query(queryDb,[vector]);
+        // Obtenemos un array de las categorias
+        const arrCategories=getCategoriesQuery.rows.map((value)=> value.name);
+        // Lanzamos error si las categorias introducidas no existen en la base de datos
+        const result=vector.filter((value)=> !arrCategories.includes(value));
+
+        if(result.length>0){
+            throw new Error(`These categories: ${result.join(', ')} do not exist`);
+        }
+        
+        return true;
+    }),
 
     body('published')
         .isBoolean()

@@ -28,17 +28,13 @@ const createPost=async(req,res,next)=>{
 
     const postId= postResult.rows[0].id;
 
-    if(category_ids.length>0){
+    if(category_ids && category_ids.length>0){
 
-        let placeholders=[];
-        for(i=1;i<=category_ids.length;i++){
-            let count=i+1
-            placeholders.push(`($1,$${count})`);
-        }
-        placeholders.join(',')
+        const placeholders=category_ids.map((values,i)=>{
+            return `($${i*2+1},$${i*2+2}`;
+        }).join(',');
 
-        let valuesInsert=[postId];
-        valuesInsert.push(...category_ids);
+        const valuesInsert=category_ids.flatMap((category_id)=>[postId,category_id]);
 
         const insertCategoryIdsQuery=`
         INSERT INTO post_categories (post_id,category_id)

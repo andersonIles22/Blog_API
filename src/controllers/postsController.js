@@ -119,7 +119,7 @@ const getAllPost=async(req,res,next)=>{
         )
         const numberOfPosts=queryGetAllPost.rows[0].count;
         const numberOfPages=Math.ceil(numberOfPosts/limit);
-        console.log(page, numberOfPages);
+        console.log(page, numberOfPages,numberOfPosts);
         
         if(numberOfPosts>0 && page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 

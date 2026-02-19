@@ -31,7 +31,7 @@ const createPost=async(req,res,next)=>{
     if(category_ids && category_ids.length>0){
 
         const placeholders=category_ids.map((values,i)=>{
-            return `($${i*2+1},$${i*2+2}`;
+            return `($${i*2+1},$${i*2+2})`;
         }).join(',');
 
         const valuesInsert=category_ids.flatMap((category_id)=>[postId,category_id]);

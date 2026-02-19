@@ -18,7 +18,7 @@ const createPost=async(req,res,next)=>{
     const insertPostQuery=`
     INSERT INTO  posts (title, content, author_id, published)
      VALUES ($1,$2,$3,$4) 
-    RETURNING id`;
+    RETURNING *`;
 
     // Consulta Principal
     const postResult=await client.query(
@@ -49,7 +49,11 @@ const createPost=async(req,res,next)=>{
 
     res.status(HTTP_STATUS.CREATED).json({
         success:true,
-        message:"Post published successfully"
+        message:"Post published successfully",
+        data:{
+            ...postResult.rows[0],
+            categories:category_ids
+        }
     })
     } catch (error) {
         await client.query(`ROLLBACK`);

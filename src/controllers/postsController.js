@@ -87,13 +87,26 @@ const getAllPost=async(req,res,next)=>{
         const valuesArr=[];
         const baseQuery=
         `SELECT 
-            p.*,
-            u.name,
-            u.email,
-            P_G.category_id
-        FROM users u 
+            p.id,
+            p.title,
+            p.content,
+            json_build_object(
+                'id',u.id,
+                'name',u.name
+            ) as author,
+            COALESCE(
+                JSON_AGG(
+                    json_build_object(
+                    'id',p_c.category_id,
+                    'name',cat.name
+                    )
+                ) FILTER (where p_c.category_id IS not NULL)
+            ,'[]')  as category_ids
+        FROM users u
         JOIN posts p ON u.id=p.author_id
-        LEFT JOIN post_categories p_g ON p.id=p_g.post_id`;
+        LEFT JOIN post_categories p_c ON p.id=p_c.post_id
+        LEFT JOIN categories cat ON p_c.category_id=cat.id
+        `;
 
         const {page,limit,author_id,published}=matchedData(req);
         // Validamos que los parametros existan y asi establecer las condicionales en caso de indicar en la ruta
@@ -114,16 +127,13 @@ const getAllPost=async(req,res,next)=>{
         }
         // Se establece una consulta a la db para obtener el numero total 
         // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET
-        let finalQueryAllPost= `SELECT 
-            count(*)
-        FROM users u 
-        JOIN posts p ON u.id=p.author_id
-        LEFT JOIN post_categories p_g ON p.id=p_g.post_id ${whereConditions}`
+        let finalQueryAllPost= `SELECT COUNT(*) FROM posts p ${whereConditions}`
         const queryGetAllPost= await db.query(
             finalQueryAllPost, valuesArr
         )
         const numberOfPosts=queryGetAllPost.rows[0].count;
-        const numberOfPages=Math.ceil(numberOfPosts/limit);        
+        const numberOfPages=Math.ceil(numberOfPosts/limit);
+
         if(numberOfPosts>0 && page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
         
@@ -136,7 +146,12 @@ const getAllPost=async(req,res,next)=>{
             limitePage=`LIMIT $${number-1} OFFSET $${number}`
         }
 
-        let resultQuery=`${baseQuery} ${whereConditions} ORDER BY p.created_at DESC ${limitePage}`;
+        let resultQuery=`
+            ${baseQuery} 
+            ${whereConditions} 
+            GROUP BY p.id, u.id
+            ORDER BY p.created_at DESC 
+            ${limitePage}`;
 
         // Consulta con todos los parametros establecidos en la query de la ruta
         const queryGetPostLimited=await db.query(

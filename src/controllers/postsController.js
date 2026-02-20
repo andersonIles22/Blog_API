@@ -119,7 +119,7 @@ const getAllPost=async(req,res,next)=>{
             finalQueryAllPost, valuesArr
         )
 
-        const testquery= await db.query(`SELECT COUNT(*) FROM posts p`)
+        const testquery= await db.query(`SELECT COUNT(*) FROM posts p WHERE author_id=6` )
         console.log(testquery.rows[0].count)
         const numberOfPosts=queryGetAllPost.rows[0].count;
         const numberOfPages=Math.ceil(numberOfPosts/limit);

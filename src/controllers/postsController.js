@@ -118,13 +118,8 @@ const getAllPost=async(req,res,next)=>{
         const queryGetAllPost= await db.query(
             finalQueryAllPost, valuesArr
         )
-
-        const testquery= await db.query(`SELECT COUNT(*) FROM posts p WHERE author_id=6` )
-        console.log(testquery.rows[0].count)
         const numberOfPosts=queryGetAllPost.rows[0].count;
-        const numberOfPages=Math.ceil(numberOfPosts/limit);
-        console.log(page, numberOfPages,numberOfPosts,queryGetAllPost.rows[0].length);
-        
+        const numberOfPages=Math.ceil(numberOfPosts/limit);        
         if(numberOfPosts>0 && page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
         
@@ -154,7 +149,8 @@ const getAllPost=async(req,res,next)=>{
                 currentPage:page,
                 pageSize:limit
             },
-            data:queryGetPostLimited.rows
+            data:queryGetPostLimited.rows,
+            categories_ids:queryGetPostLimited.rows[0].category_id
         });
     } catch (error) {
         next(error);

@@ -89,7 +89,8 @@ const getAllPost=async(req,res,next)=>{
         `SELECT 
             p.*,
             u.name,
-            u.email
+            u.email,
+            P_G.category_id
         FROM users u 
         JOIN posts p ON u.id=p.author_id
         LEFT JOIN post_categories p_g ON p.id=p_g.post_id`;

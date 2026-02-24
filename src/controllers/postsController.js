@@ -108,7 +108,7 @@ const getAllPost=async(req,res,next)=>{
         LEFT JOIN categories cat ON p_c.category_id=cat.id
         `;
 
-        const {page,limit,author_id,published}=matchedData(req);
+        const {page,limit,author_id,published,category}=matchedData(req);
         // Validamos que los parametros existan y asi establecer las condicionales en caso de indicar en la ruta
         if(author_id){
             valuesArr.push(author_id)
@@ -119,6 +119,11 @@ const getAllPost=async(req,res,next)=>{
             valuesArr.push(published)
             let number=valuesArr.length
             conditionArr.push(`p.published=$${number}`)
+        }
+        if(category){
+            valuesArr.push(category)
+            let number=valuesArr.length
+            conditionArr.push(`cat.name=$${number}`)
         }
 
         let whereConditions=conditionArr.join(` AND `)

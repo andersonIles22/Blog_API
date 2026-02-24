@@ -148,7 +148,7 @@ const validatePost=[
     }),
 
     body('published')
-        .isBoolean()
+        .isBoolean({strict:true})
             .withMessage(MESSAGES_VALIDATION.PUBLISHED_VALUE_MUST_BE_BOOLEAN), 
     (req,res,next)=>{
         const errors=validationResult(req);
@@ -256,6 +256,26 @@ const validateQueryGetPosts=[
         .optional()
         .isIn(['true','false'])
             .withMessage(MESSAGES_VALIDATION.QUERY_PUBLISHED_MUST_BE_BOOLEAN),
+    query('category')
+        .optional()
+        .trim()
+        .isString()
+            .withMessage(MESSAGES_VALIDATION.QUERY_TECHNOLOGY_MUST_BE_A_STRING)
+        .custom(async(value)=>{
+            const queryTechDb=`
+            SELECT name FROM categories
+            WHERE name=$1
+            `
+            const getTechsQuery=await db.query(
+                queryTechDb,
+                [value]
+            )
+
+            if(getTechsQuery.rows[0].length===0){
+                throw new Error(`The ${value} category is not found`);
+            }
+            return true;
+        }),
     (req,res,next)=>{
          const errors=validationResult(req);
         if(!errors.isEmpty())return res.status(HTTP_STATUS.BAD_REQUEST).json({

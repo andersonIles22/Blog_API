@@ -24,7 +24,8 @@ const MESSAGES_VALIDATION=({
     PUBLISHED_VALUE_MUST_BE_BOOLEAN:"Published values must be a boolean",
     COMMENT_LIMIT_CHARACTERS:"Comment should be between 3 to 500 characters",
     QUERY_LIMIT_MUST_BE:"Query Value should be between 1 to 100",
-    QUERY_PUBLISHED_MUST_BE_BOOLEAN:"Published value should be boolean"
+    QUERY_PUBLISHED_MUST_BE_BOOLEAN:"Published value should be boolean",
+    QUERY_TECHNOLOGY_MUST_BE_A_STRING:"Technology value should be a string"
 });
 module.exports={
     MESSAGES_VALIDATION

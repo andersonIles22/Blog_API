@@ -132,7 +132,13 @@ const getAllPost=async(req,res,next)=>{
         }
         // Se establece una consulta a la db para obtener el numero total 
         // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET
-        let finalQueryAllPost= `SELECT COUNT(*) FROM posts p ${whereConditions}`
+        let finalQueryAllPost= `
+            SELECT COUNT(*)
+            FROM posts p
+            LEFT JOIN post_categories p_c ON p.id=p_c.post_id
+            LEFT JOIN categories cat ON p_c.category_id=cat.id 
+            ${whereConditions}`
+
         const queryGetAllPost= await db.query(
             finalQueryAllPost, valuesArr
         )

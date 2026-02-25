@@ -271,7 +271,7 @@ const validateQueryGetPosts=[
                 [value]
             )
 
-            if(getTechsQuery.rows[0].length===0){
+            if(getTechsQuery.rows.length===0){
                 throw new Error(`The ${value} category is not found`);
             }
             return true;

@@ -191,8 +191,7 @@ const getAllPost=async(req,res,next)=>{
                 currentPage:page,
                 pageSize:limit
             },
-            data:queryGetPostLimited.rows,
-            categories_ids:queryGetPostLimited.rows[0].category_id
+            data:queryGetPostLimited.rows
         });
     } catch (error) {
         next(error);

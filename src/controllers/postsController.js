@@ -35,7 +35,7 @@ const createPost=async(req,res,next)=>{
         }).join(',');
 
         const valuesInsert=category_ids.flatMap((category_id)=>[postId,category_id]);
-
+        // Sub consulta
         const insertCategoryIdsQuery=`
         INSERT INTO post_categories (post_id,category_id)
         VALUES ${placeholders}`;
@@ -132,7 +132,7 @@ const getAllPost=async(req,res,next)=>{
         }
         // Se establece una consulta a la db para obtener el numero total 
         // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET
-        let finalQueryAllPost= `
+        let QueryAllPost= `
             SELECT COUNT(*)
             FROM posts p
             LEFT JOIN post_categories p_c ON p.id=p_c.post_id
@@ -140,12 +140,24 @@ const getAllPost=async(req,res,next)=>{
             ${whereConditions}`
 
         const queryGetAllPost= await db.query(
-            finalQueryAllPost, valuesArr
+            QueryAllPost, valuesArr
         )
-        const numberOfPosts=queryGetAllPost.rows[0].count;
+        const numberOfPosts=queryGetAllPost.rows.count;
         const numberOfPages=Math.ceil(numberOfPosts/limit);
 
-        if(numberOfPosts>0 && page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
+        if(numberOfPosts>0 && page>numberOfPages){
+        return res.status(HTTP_STATUS.OK).JSON({
+            success:true,
+            message:"Not posts found for this page",
+            pagination:{
+                totalPosts:numberOfPosts,
+                totalPages:numberOfPages,
+                currentPage:page,
+                pageSize:limit
+            },
+            data:[]
+        });
+        }    
 
         
         // LIMIT y OFFSET al final para evitar problemas con el conteo de posts aplicando o no los filtros

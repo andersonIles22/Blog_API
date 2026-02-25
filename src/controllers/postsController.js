@@ -146,7 +146,7 @@ const getAllPost=async(req,res,next)=>{
         const numberOfPages=Math.ceil(numberOfPosts/limit);
 
         if(numberOfPosts>0 && page>numberOfPages){
-        return res.status(HTTP_STATUS.OK).JSON({
+        return res.status(HTTP_STATUS.OK).json({
             success:true,
             message:"Not posts found for this page",
             pagination:{

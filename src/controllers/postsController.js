@@ -121,7 +121,7 @@ const getAllPost=async(req,res,next)=>{
             conditionArr.push(`p.published=$${number}`)
         }
         if(category){
-            valuesArr.push(category.toLowerCase())
+            valuesArr.push(category)
             let number=valuesArr.length
             conditionArr.push(`LOWER(cat.name)=$${number}`)
         }

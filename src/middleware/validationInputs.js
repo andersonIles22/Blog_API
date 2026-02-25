@@ -261,6 +261,8 @@ const validateQueryGetPosts=[
         .trim()
         .isString()
             .withMessage(MESSAGES_VALIDATION.QUERY_TECHNOLOGY_MUST_BE_A_STRING)
+        .bail()
+        .toLowerCase()
         .custom(async(value)=>{
             const queryTechDb=`
             SELECT name FROM categories

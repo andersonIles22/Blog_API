@@ -133,7 +133,7 @@ const getAllPost=async(req,res,next)=>{
         // Se establece una consulta a la db para obtener el numero total 
         // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET
         let QueryAllPost= `
-            SELECT COUNT(*)
+            SELECT COUNT(DISTINCT p.id)
             FROM posts p
             LEFT JOIN post_categories p_c ON p.id=p_c.post_id
             LEFT JOIN categories cat ON p_c.category_id=cat.id 
@@ -142,7 +142,7 @@ const getAllPost=async(req,res,next)=>{
         const queryGetAllPost= await db.query(
             QueryAllPost, valuesArr
         )
-        const numberOfPosts=queryGetAllPost.rows.count;
+        const numberOfPosts=queryGetAllPost.rows[0].count;
         const numberOfPages=Math.ceil(numberOfPosts/limit);
 
         if(numberOfPosts>0 && page>numberOfPages){

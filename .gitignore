@@ -1,5 +1,5 @@
 node_modules/
 .env
 .env.tests
-practices.js
+practice.js
 coverage/

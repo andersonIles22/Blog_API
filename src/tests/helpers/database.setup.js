@@ -15,13 +15,22 @@ const seedTestData = async () => {
   // Usuario de prueba
   await db.query(`
     INSERT INTO users (email, password,name)
-    VALUES ('test@example.com', 'hashed_password', 'Pepe'),
-      ('mano@gmail.com','hashed_password','Juan'),
-      ('foot@gmail.com','hashed_password','Fracisco'),
-      ('waos@gmail.com','hashed_password','Marta'),
-      ('who@gmail.com','hashed_password','Laura')
+    VALUES ('test@example.com', 'Dime que funciona', 'Pepe'),
+      ('mano@gmail.com','Dime que funciona','Juan'),
+      ('foot@gmail.com','Dime que funciona','Fracisco'),
+      ('waos@gmail.com','Dime que funciona','Marta'),
+      ('who@gmail.com','Dime que funciona','Laura')
   `);
   
+  //Post de pruebas
+   await db.query(`
+    INSERT INTO posts (title,content,author_id)
+    VALUES ('Life', 'Dime que funciona', 1),
+      ('Dont die','Dime que funciona',1),
+      ('Do not lie to me','Dime que funciona',3),
+      ('The worst party','Dime que funciona',2),
+      ('My house is so big','Dime que funciona',4)
+  `);
   // Categorías de prueba
   await db.query(`
     INSERT INTO categories (name)

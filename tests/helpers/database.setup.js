@@ -1,17 +1,30 @@
-const db=require('../../config/database');
+const db=require('../../src/config/database');
 
 const cleanDataBase= async()=>{
     await db.query(`
         TRUNCATE TABLE users RESTART IDENTITY CASCADE;
-        TRUNCATE TABLE categories RESTART IDENTITY CASCADE;
+        TRUNCATE TABLE categories RESTART IDENTITY CASCADE
         `);
 };
+
+const cleanPostTable= async () => {
+    await db.query(
+      `TRUNCATE TABLE posts RESTART IDENTITY CASCADE`
+    )
+}
 
 const closeConnection= async()=>{
     await db.end();
 }
 
-const seedTestData = async () => {
+const seedUserTestData=async()=>{
+  const insertAndGet=await db.query(`
+    INSERT INTO users (email,password,name)
+    VALUES ('onlyUser@gmail.com','PasswordxD','El Admin')
+    RETURNING *`)
+  return insertAndGet.rows[0];
+};
+const seedUsersTestData = async () => {
   // Usuario de prueba
   await db.query(`
     INSERT INTO users (email, password,name)
@@ -41,5 +54,7 @@ const seedTestData = async () => {
 module.exports={
     cleanDataBase,
     closeConnection,
-    seedTestData
+    seedUserTestData,
+    seedUsersTestData,
+    cleanPostTable
 }

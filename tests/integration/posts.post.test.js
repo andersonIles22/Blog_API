@@ -4,9 +4,10 @@ const {cleanDataBase,cleanPostTable,seedUserTestData}=require('../helpers/databa
 const {generateToken,getDataById}=require('../helpers/auth.test.helper');
 const api=supertest(app);
 
+let token;
+let userData;
+
 describe('POST /api/post/',()=>{
-    let token;
-    let userData;
     beforeAll(async () => {
         userData=await seedUserTestData();
         token=await generateToken(userData);
@@ -50,4 +51,74 @@ describe('POST /api/post/',()=>{
             })
        expect(response.body.data.author_id).toBe(userData.id)
     })  
+})
+
+describe('POST api/posts - Input validation ',()=>{
+    beforeEach(async()=>{
+        await cleanPostTable();
+    })
+    const baseUrl='/api/posts';
+
+    it('It should fail with 400 if title is empty',async ()=>{
+        const response=await api
+            .post(baseUrl)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                title:'',
+                content:'Decido volverme más comprometido con mi carrera',
+                published:true
+            })
+        console.log(response.body)
+        expect(response.status).toBe(400)
+        expect(response.body.errors).toContainEqual( { field: 'title', message: 'Title is required' })
+    })
+
+    it('It should fail with 400 if content is too short', async () => {
+        const response=await api 
+            .post(baseUrl)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                title:'Ser un Profesional',
+                content:'uwu',
+                published:true
+            })
+            expect(response.status).toBe(400)
+            expect(response.body.errors).toContainEqual(        {
+              field: 'content',
+              message: 'The content should be a least 20 characters'
+            })
+        })
+    
+    it('It should fail with 400 if category_ids is not an array', async () => {
+        const response=await api
+            .post(baseUrl)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                title:'Ser un Profesional',
+                content:'Como Midudev o Hector de León, asi de profesionales',
+                category_ids:'',
+                published:true
+            })
+        expect(response.status).toBe(400)
+        expect(response.body.errors).toContainEqual({
+            field:'category_ids',
+            message:'Category_ids must be an Array'
+        })
+    })
+    it('Is should fail with 400 if category_ids are not positive integers',async()=>{
+        const response= await api
+            .post(baseUrl)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                title:'Ser un Profesional',
+                content:'Como Midudev o Hector de León, asi de profesionales',
+                category_ids:['hola pedrito'],
+                published:true
+            })
+        expect(response.status).toBe(400)
+        expect(response.body.errors).toContainEqual(        {
+          field: 'category_ids[0]',
+          message: 'Category_ids values must be positive integers greater than 1'
+        })
+    })
 })

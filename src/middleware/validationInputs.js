@@ -4,6 +4,7 @@ const {MESSAGES_VALIDATION}=require('../constants/messagesValidation');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
 const db = require('../config/database');
 
+//#region  REGISTER
 const validateRegister=[
     body('email')
         .trim()
@@ -30,7 +31,7 @@ const validateRegister=[
         next();
     }
 ];
-
+ //#region LOGIN
 const validateLogin=[
     body('email')
         .trim()
@@ -55,6 +56,7 @@ const validateLogin=[
     }
 ]
 
+//#region CHANGE PASS
 const validateChangePassword = [
   body('currentPass')
     .notEmpty().withMessage(MESSAGES_VALIDATION.PASSWORD_EMPTY),
@@ -87,7 +89,7 @@ const validateChangePassword = [
     next();
   }
 ];
-
+//#region POST
 const validatePost=[
     body('title')
         .trim()
@@ -164,6 +166,8 @@ const validatePost=[
         next();
     }
 ]
+
+//#region UPDATE
 const validateUpdate=[
     param('post_id')
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_ID}).withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER)
@@ -197,6 +201,7 @@ const validateUpdate=[
     }
 ];
 
+//#region ID POST
 const validateIdPost=[
     param('post_id')
         .isInt({min:VALIDATION_VALUES.MIN_VALUE_ID}).withMessage(MESSAGES_VALIDATION.MUST_BE_A_INTEGER)
@@ -216,6 +221,7 @@ const validateIdPost=[
     }
 ]
 
+//#region COMMENT
 const validateCommentPost=[
     body('post_comment')
         .trim()
@@ -236,7 +242,7 @@ const validateCommentPost=[
     }
 ]
 
-
+//#region QUERY POST
 const validateQueryGetPosts=[
     query('page')
         .default(VALIDATION_VALUES.DEFAULT_VALUE_QUERY_PAGE)

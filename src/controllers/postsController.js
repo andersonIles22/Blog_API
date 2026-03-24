@@ -5,6 +5,7 @@ const {MESSAGES_OPERATION}=require('../constants/statusMessages');
 const { matchedData } = require('express-validator');
 
 
+//#region INSERT
 
 const createPost=async(req,res,next)=>{
     const client=await db.connect();
@@ -64,6 +65,7 @@ const createPost=async(req,res,next)=>{
     }
 }
 
+//#region  GET ById
 const getPostById=async (req,res,next) => {
     try {
         const id=parseInt(req.params.post_id);
@@ -81,6 +83,8 @@ const getPostById=async (req,res,next) => {
         next(error);
     }
 }
+//#region GET ALL
+
 const getAllPost=async(req,res,next)=>{
     try {
         const conditionArr=[];
@@ -197,7 +201,7 @@ const getAllPost=async(req,res,next)=>{
         next(error);
     }
 }
-
+//#region UPDATE
 const updatePost=async (req,res,next) => {
     try {
         const {post_id}=req.params;
@@ -228,7 +232,9 @@ const updatePost=async (req,res,next) => {
         next(error)
     }
 }
+//#endregion
 
+//#region DELETE
 const deletePost=async(req,res,next)=>{
     try {
         const {post_id}=req.params;

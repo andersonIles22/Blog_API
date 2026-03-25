@@ -48,13 +48,17 @@ const seedUsersWithRolePostsTestData=async()=>{
       ('My house is so big','Dime que funciona',2)
     `
   );
-  const getUserQuery= await db.query(`
+  const getUsersQuery= await db.query(`
     SELECT id,email,role FROM users
-    `)
-  return getUserQuery.rows;
-
+    `);
+  const getPostsIdQuery=await db.query(`
+    SELECT id FROM posts
+    `);
+  return{
+    users:getUsersQuery.rows,
+    postsId:getPostsIdQuery.rows.map(obj=>obj.id)
+  }
 };
-
 
 const seedUsersPostsCategoriesTestData = async () => {
   // Usuario de prueba

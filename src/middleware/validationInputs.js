@@ -8,6 +8,7 @@ const db = require('../config/database');
 const validateRegister=[
     body('email')
         .trim()
+        .notEmpty().withMessage(MESSAGES_VALIDATION.EMAIL_REQUIRED)
         .isEmail().withMessage(MESSAGES_VALIDATION.EMAIL_INVALID)
         .isLength({max:VALIDATION_VALUES.MAX_LENGTH_EMAIL})
         .normalizeEmail(),

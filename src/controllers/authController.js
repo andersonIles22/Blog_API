@@ -29,7 +29,7 @@ const register=async (req,res,next)=>{
         );
         //RESPONSE
         res.status(HTTP_STATUS.CREATED).json({
-            seccess:true,
+            success:true,
             data:{
                 userCreated:{
                     id:userCreated.id,

@@ -20,7 +20,7 @@ const closeConnection= async()=>{
 const seedUserTestData=async () => {
   const getUserQuery=await db.query(`
     INSERT INTO users (email,password,name)
-    VALUES ('onlyUser@gmail.com','PasswordxD','El Admin')
+    VALUES ('onlyuser@gmail.com','PasswordxD','El Admin')
     RETURNING id,email,role`)
   return getUserQuery.rows[0]
 }

@@ -12,7 +12,7 @@ const register=async (req,res,next)=>{
         const queryRegister=await db.query('SELECT id FROM users WHERE email=$1',[email]);
         
         if(queryRegister.rows.length>0){
-            return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.EMAIL_ALREADY_EXIST,next)
+            return error(HTTP_STATUS.CONFLICT,MESSAGES_OPERATION.EMAIL_ALREADY_EXIST,next)
         }
         //HASH PASSWORD
         const salt =await bcrypt.genSalt(10);

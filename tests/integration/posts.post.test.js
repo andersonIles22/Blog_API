@@ -1,7 +1,7 @@
 const supertest=require('supertest');
 const app=require('../../src/app');
 const {cleanDataBase,cleanPostTable,seedUserTestData}=require('../helpers/database.setup');
-const {generateToken,getDataById}=require('../helpers/auth.test.helper');
+const {generateToken}=require('../helpers/auth.test.helper');
 const api=supertest(app);
 
 let token;
@@ -10,7 +10,7 @@ let userData;
 describe('POST /api/post/',()=>{
     beforeAll(async () => {
         userData=await seedUserTestData();
-        token=await generateToken(userData);
+        token= generateToken(userData);
     })
 
     afterAll(async () => {
@@ -68,7 +68,6 @@ describe('POST api/posts - Input validation ',()=>{
                 content:'Decido volverme más comprometido con mi carrera',
                 published:true
             })
-        console.log(response.body)
         expect(response.status).toBe(400)
         expect(response.body.errors).toContainEqual( { field: 'title', message: 'Title is required' })
     })

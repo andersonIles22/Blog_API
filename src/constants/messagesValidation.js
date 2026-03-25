@@ -1,6 +1,7 @@
 const MESSAGES_VALIDATION=({
     EMAIIL_TOO_LONG:"Email must be 255 chareacters or less",
     EMAIL_INVALID:"Valid email required",
+    EMAIL_REQUIRED:"Email required",
     PASSWORD_TOO_SHORT:"Password must be at least 6 characters",
     PASSWORD_EMPTY:"Password required",
     NAME_REQUIRED:"Name is required",

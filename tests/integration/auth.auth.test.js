@@ -1,8 +1,7 @@
 const supertest=require('supertest');
 const app=require('../../src/app');
 const { seedUserTestData, cleanDataBase } = require('../helpers/database.setup');
-const expectCookies = require('supertest/lib/cookies');
-const { body } = require('express-validator');
+
 
 const api=supertest(app);
 
@@ -93,7 +92,7 @@ describe('POST /api/auth/register/ - Register Succesfully',()=>{
     })
     const baseUrl='/api/auth/register/';
 
-    it('Should work with 201 if register is succesfully',async () => {
+    it('Should work with 201 if register is successful',async () => {
         const response=await api
             .post(baseUrl)
             .send({
@@ -108,4 +107,105 @@ describe('POST /api/auth/register/ - Register Succesfully',()=>{
         })
     })
 
+})
+
+describe('POST /api/auth/login - Input Validations', ()=>{
+    beforeAll(async()=>{
+      await seedUserTestData();
+    })
+
+    afterAll(async () => {
+        await cleanDataBase(); 
+    })
+
+    const baseUrl='/api/auth/login';
+
+    it.each([
+        {
+            desc:'the email has an invalid format',
+            data:{email:'onlyuser@gmail....com',password:'PasswordxD'},
+            expectedError:'Valid email required',
+            expectedStatus:400
+        },
+        {
+            desc:'the field password is empty',
+            data:{email:'onlyuser@gmail.com',password:''},
+            expectedError:'Password required',
+            expectedStatus:400
+        }
+    ])(`Shoul fail if $desc`, async ({data,expectedError,expectedStatus}) => {
+        const response= await api
+            .post(baseUrl)
+            .send(data)
+        expect(response.status).toBe(expectedStatus)
+        expect(response.body.errors).toContainEqual(
+            expect.objectContaining({message:expectedError})
+        )
+    })
+})
+
+describe('Post /api/auth/login - Login Succesful',()=>{
+       let check
+    beforeAll(async()=>{
+      check=await seedUserTestData();
+    })
+
+    afterAll(async () => {
+        await cleanDataBase(); 
+    })
+
+    const baseUrl='/api/auth/login';
+
+    it.each([
+        {
+            desc:'the login was successful ',
+            data:{email:'onlyuser@gmail.com',password:'PasswordxD'},
+            expectedError:'Valid email required',
+            expectedStatus:200
+        }
+    ])(`Shoul work if $desc`, async ({data,expectedError,expectedStatus}) => {
+        const response= await api
+            .post(baseUrl)
+            .send(data)
+        expect(response.status).toBe(expectedStatus)
+        expect(response.body).toMatchObject({
+            success:true,
+            message:expect.any(String),
+            token:expect.any(String)
+
+        })
+    })
+})
+
+describe('Post /api/auth/login - Login Error ',()=>{
+    beforeAll(async()=>{
+      await seedUserTestData();
+    })
+
+    afterAll(async () => {
+        await cleanDataBase(); 
+    })
+
+    const baseUrl='/api/auth/login';
+
+    it.each([
+        {
+            desc:'the password are invalid',
+            data:{email:'onlyuser@gmail.com',password:'waos'},
+            expectedError:'Invalid Credentials',
+            expectedStatus:401
+        },
+        {
+            desc:'the email are invalid',
+            data:{email:'tupapi@gmail.com',password:'PasswordxD'},
+            expectedError:'Invalid Credentials',
+            expectedStatus:401
+        }
+    ])(`Shoul fail if $desc`, async ({data,expectedError,expectedStatus}) => {
+        const response= await api
+            .post(baseUrl)
+            .send(data)
+        expect(response.status).toBe(expectedStatus)
+        expect(response.body).toMatchObject({error:expectedError})
+    })
 })

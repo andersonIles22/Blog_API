@@ -1,4 +1,5 @@
 const db=require('../../src/config/database');
+const bcrypt=require('bcryptjs');
 
 const cleanDataBase= async()=>{
     await db.query(`
@@ -18,10 +19,13 @@ const closeConnection= async()=>{
 }
 
 const seedUserTestData=async () => {
+  const rawPassword='PasswordxD';
+  const hashedPass=await bcrypt.hash(rawPassword,10);
+
   const getUserQuery=await db.query(`
     INSERT INTO users (email,password,name)
-    VALUES ('onlyuser@gmail.com','PasswordxD','El Admin')
-    RETURNING id,email,role`)
+    VALUES ($1,$2,$3)
+    RETURNING id,email,role`,['onlyuser@gmail.com',hashedPass,'El Admin'])
   return getUserQuery.rows[0]
 }
 const seedUsersWithRolePostsTestData=async()=>{

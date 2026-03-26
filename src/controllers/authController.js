@@ -49,21 +49,17 @@ const login= async (req,res,next)=>{
     try {
         const {email,password}=req.body;
         
-        //Comprobamos de que usuario exista
+        //Comprobamos credenciales validas
         const queryGetData= await db.query(
             `SELECT id,email, password,role FROM users WHERE email=$1`,
             [email]
         );
+
         const user=queryGetData.rows[0];
-        if (!user) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.USER_NOT_FOUND,next);
 
-        // Comprobamos email valido
-        if(email!==user.email) return error(HTTP_STATUS.AUTHORIZATION_REQUIRED,MESSAGES_OPERATION.EMAIL_INVALID,next);
-        // Comprobamos password valido
         const checkPass= await bcrypt.compare(password, user.password);
-        if(!checkPass) return error(HTTP_STATUS.AUTHORIZATION_REQUIRED, MESSAGES_OPERATION.PASSWORD_INVALID,next);
 
-        //Generación de Access token
+        if(!user||!checkPass) return error(HTTP_STATUS.AUTHORIZATION_REQUIRED,MESSAGES_OPERATION.CREDENTIALS_INVALID,next)
 
         const accesstoken=jwt.sign(
             {id:user.id,gmail:user.email,role:user.role},

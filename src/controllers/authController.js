@@ -56,10 +56,11 @@ const login= async (req,res,next)=>{
         );
 
         const user=queryGetData.rows[0];
-
+        
+        if(!user) return error(HTTP_STATUS.AUTHORIZATION_REQUIRED,MESSAGES_OPERATION.CREDENTIALS_INVALID,next)
         const checkPass= await bcrypt.compare(password, user.password);
+        if(!checkPass) return error(HTTP_STATUS.AUTHORIZATION_REQUIRED,MESSAGES_OPERATION.CREDENTIALS_INVALID,next)
 
-        if(!user||!checkPass) return error(HTTP_STATUS.AUTHORIZATION_REQUIRED,MESSAGES_OPERATION.CREDENTIALS_INVALID,next)
 
         const accesstoken=jwt.sign(
             {id:user.id,gmail:user.email,role:user.role},

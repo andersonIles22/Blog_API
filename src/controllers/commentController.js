@@ -54,6 +54,7 @@ const getPostcomments=async (req,res,next) => {
         )
         const countComments=queryGetAllCommentsOnPost.rows[0].count;
         console.log(countComments)
+        console.log(typeof countComments )
         if(countComments<1){
             console.log('si entro xd')
             return res.status(HTTP_STATUS.OK).json({

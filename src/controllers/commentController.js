@@ -55,6 +55,7 @@ const getPostcomments=async (req,res,next) => {
         const countComments=queryGetAllCommentsOnPost.rows[0].count;
         console.log(countComments)
         if(countComments===0){
+            console.log('si entro xd')
             return res.status(HTTP_STATUS.OK).json({
             success:true,
             pagination:{

@@ -52,7 +52,20 @@ const getPostcomments=async (req,res,next) => {
             WHERE com.post_id=$1`,
             [post_id]
         )
-        const numberAllComments=queryGetAllCommentsOnPost.rows[0].count
+        const countComments=queryGetAllCommentsOnPost.rows[0].count;
+
+        if(countComments===0) return res.status(HTTP_STATUS.OK).json({
+            success:true,
+            pagination:{
+                totalComments:0,
+                totalPages:0,
+                currentPage:page,
+                pageSize:limit
+            },
+            data:[]
+        })
+        
+        const numberAllComments=countComments
         const numberOfPages=Math.ceil(numberAllComments/limit);
         if(page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 

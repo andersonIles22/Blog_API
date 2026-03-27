@@ -54,7 +54,8 @@ const getPostcomments=async (req,res,next) => {
         )
         const countComments=queryGetAllCommentsOnPost.rows[0].count;
         console.log(countComments)
-        if(countComments===0) return res.status(HTTP_STATUS.OK).json({
+        if(countComments===0){
+            return res.status(HTTP_STATUS.OK).json({
             success:true,
             pagination:{
                 totalComments:0,
@@ -64,6 +65,7 @@ const getPostcomments=async (req,res,next) => {
             },
             data:[]
         })
+        } 
 
         const numberAllComments=countComments
         const numberOfPages=Math.ceil(numberAllComments/limit);

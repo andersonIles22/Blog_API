@@ -52,11 +52,9 @@ const getPostcomments=async (req,res,next) => {
             WHERE com.post_id=$1`,
             [post_id]
         )
-        const countComments=queryGetAllCommentsOnPost.rows[0].count;
-        console.log(countComments)
-        console.log(typeof countComments )
-        if(countComments<1){
-            console.log('si entro xd')
+        const countComments=parseInt(queryGetAllCommentsOnPost.rows[0].count);
+
+        if(countComments===0){
             return res.status(HTTP_STATUS.OK).json({
             success:true,
             pagination:{
@@ -69,8 +67,7 @@ const getPostcomments=async (req,res,next) => {
         })
         } 
 
-        const numberAllComments=countComments
-        const numberOfPages=Math.ceil(numberAllComments/limit);
+        const numberOfPages=Math.ceil(countComments/limit);
         if(page>numberOfPages) return error(HTTP_STATUS.BAD_REQUEST,MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,next);
 
         const queryGetSomeCommentsOnPost=await db.query(
@@ -92,7 +89,7 @@ const getPostcomments=async (req,res,next) => {
         res.status(HTTP_STATUS.OK).json({
             success:true,
             pagination:{
-                totalComments:numberAllComments,
+                totalComments:countComments,
                 totalPages:numberOfPages,
                 currentPage:page,
                 pageSize:limit

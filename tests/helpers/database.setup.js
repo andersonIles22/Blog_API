@@ -107,6 +107,24 @@ const getUsersTestData= async () => {
   return users.rows;
 }
 
+const seedUserPostCommentTestData=async () => {
+  const getInfoUserQuery=await db.query(`
+    INSERT INTO users(email, password,name)
+    VALUES('elsenior@gmail.com','PasswordxD','El poeta')
+    RETURNING id, email, role`);
+  await db.query(`
+    INSERT INTO posts(title,content,author_id,published)
+    VALUES
+    ('No intenten esto en casa','Si quieren quedarse sin cejas por un tiempo juegue con tiner y fuego',1,true),
+    ('No digan mentiras','Nuncan mientan si saben que la otra persona ya sabe la verdad',1,true)
+    `);
+  await db.query(`
+    INSERT INTO comments(post_id,author_id, content)
+    VALUES(1,1,'Eso no es nada, por jugar con esas cosas me queme el cabello xD')
+    `);
+  
+  return getInfoUserQuery.rows[0];
+}
 const updatePublishedPostTestData=async () => {
   await db.query(`
     UPDATE posts
@@ -123,6 +141,7 @@ module.exports={
     seedUserTestData,
     seedUsersWithRolePostsTestData,
     seedUsersPostsCategoriesTestData,
+    seedUserPostCommentTestData,
     updatePublishedPostTestData,
     getUsersTestData
 }

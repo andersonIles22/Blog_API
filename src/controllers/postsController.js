@@ -3,65 +3,29 @@ const db=require('../config/database');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
 const {MESSAGES_OPERATION}=require('../constants/statusMessages');
 const { matchedData } = require('express-validator');
+const {createPost}=require('../services/postsService')
 
 
 //#region INSERT
 
-const createPost=async(req,res,next)=>{
-    const client=await db.connect();
-    try {
-    const {title,content,published,category_ids}=req.body;
-    const author_id=req.user.id;
- 
-    //Iniciar Transacción
-
-    await client.query('BEGIN');
-    const insertPostQuery=`
-    INSERT INTO  posts (title, content, author_id, published)
-     VALUES ($1,$2,$3,$4) 
-    RETURNING *`;
-
-    // Consulta Principal
-    const postResult=await client.query(
-        insertPostQuery,
-        [title,content,author_id,published||false]
-    )
-
-    const postId= postResult.rows[0].id;
-
-    if(category_ids && category_ids.length>0){
-
-        const placeholders=category_ids.map((values,i)=>{
-            return `($${i*2+1},$${i*2+2})`;
-        }).join(',');
-
-        const valuesInsert=category_ids.flatMap((category_id)=>[postId,category_id]);
-        // Sub consulta
-        const insertCategoryIdsQuery=`
-        INSERT INTO post_categories (post_id,category_id)
-        VALUES ${placeholders}`;
-
-        console.log(insertCategoryIdsQuery,valuesInsert)
-        await client.query(insertCategoryIdsQuery,valuesInsert);
-        
+const createPosts=async (req,res,next) => {
+    const postData={
+        title:req.body.title,
+        content:req.body.content,
+        published:req.body.published,
+        category_ids:req.body.category_ids,
+        author_id:req.user.id
     }
 
-    await client.query('COMMIT');
-
-    res.status(HTTP_STATUS.CREATED).json({
-        success:true,
-        message:"Post published successfully",
-        data:{
-            ...postResult.rows[0],
-            categories_ids:category_ids
-        }
+    try {
+        const result= await createPost(postData);
+        res.status(HTTP_STATUS.CREATED).json({
+            success:true,
+            message:"Post published successfully",
+            data:result
     })
     } catch (error) {
-        await client.query(`ROLLBACK`);
         next(error)
-    }
-    finally{
-        client.release();
     }
 }
 
@@ -263,7 +227,7 @@ const deletePost=async(req,res,next)=>{
 }
 
 module.exports={
-    createPost,
+    createPosts,
     getPostById,
     getAllPost,
     updatePost,

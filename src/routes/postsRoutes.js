@@ -7,7 +7,7 @@ const commentRoutes=require('../routes/commentRoutes')
 const router=express.Router();
 
 
-router.post('/',authMiddleware,validatePost,postControllers.createPost);
+router.post('/',authMiddleware,validatePost,postControllers.createPosts);
 
 router.get('/',validateQueryGetPosts,postControllers.getAllPost)
 

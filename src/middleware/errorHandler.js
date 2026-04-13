@@ -10,7 +10,7 @@ const {HTTP_STATUS}=require('../constants/httpStatusCode')
 const errorHandler=(err, req, res, next)=>{
   // si queremos mostrar la linea de codigo donde empieza a fallar
  if (process.env.NODE_ENV !== 'test') console.error('Error:', err.stack);
-  const statusCode = err.status || HTTP_STATUS.INTERNAL_ERROR;
+  const statusCode = err.status ||err.statusCode|| HTTP_STATUS.INTERNAL_ERROR;
   const message = err.message || MESSAGES_OPERATION.SERVER_ERROR;
   res.status(statusCode).json({
     success: false,

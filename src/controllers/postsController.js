@@ -90,19 +90,11 @@ const updatePost=async (req,res,next) => {
 //#region DELETE
 const deletePost=async(req,res,next)=>{
     try {
-        const {post_id}=req.params;
-
-        //Verificamos si el post existe 
-        const queryGetPosts= await db.query(
-            `SELECT * FROM posts WHERE id=$1`,[post_id]
-        );
-        const countPosts=queryGetPosts.rows.length;
-        if(!countPosts>0) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND,next);
-
-        const queryUpdatePost= await db.query(
-            `DELETE FROM posts WHERE id=$1`,[post_id]
-        );
-
+        const postId=req.params.post_id;
+        //Comprobar que existe el post
+        await postsService.findById(postId)
+        // Service de elimación de post
+        await postsService.deleteResource(postId)
         res.status(HTTP_STATUS.OK).json(
         {
             success:true,

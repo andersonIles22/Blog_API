@@ -186,7 +186,19 @@ const update= async(post)=>{
     }
 }
 
+const deleteResource=async (postId) => {
+        //Verificamos si el post existe 
+    try {
+        const postDeleteQuery= await db.query(
+        `DELETE FROM posts WHERE id=$1 RETURNING *`,
+        [postId]
+        );
+        if (!postDeleteQuery.rows[0]) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND);
+    } catch (error) {
+        throw error
+    }
 
+}
 const checkOwnerShip=async (data) => {
     const {field,resourceType,resourceId}=data;
     const getOwnerIdQuery=`
@@ -201,14 +213,11 @@ const checkOwnerShip=async (data) => {
 
     return getOwnerIdOfResource.rows[0][field];
 }
-/*
-Estabamos implementando el service Update pero surgio el problema de
-separar acciones con el middleware isOwnerOrAdmin. 
-*/
 module.exports={
     createPost,
     findById,
     findAllPosts,
     update,
+    deleteResource,
     checkOwnerShip
 };

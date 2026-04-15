@@ -1,44 +1,24 @@
 const {error}=require('../middleware/errorHandler');
 const db=require('../config/database');
-const bcrypt=require('bcryptjs');
-const jwt=require('jsonwebtoken');
+const authServices=require('../services/authService');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
 const {MESSAGES_OPERATION}=require('../constants/statusMessages')
 
 const register=async (req,res,next)=>{
     try {
-        //CHECK IF EMAIL ALREADY EXISTS
-        const {email, password, name}=req.body;
-        const queryRegister=await db.query('SELECT id FROM users WHERE email=$1',[email]);
-        
-        if(queryRegister.rows.length>0){
-            return error(HTTP_STATUS.CONFLICT,MESSAGES_OPERATION.EMAIL_ALREADY_EXIST,next)
+        const body=req.body;
+        const dataUser={
+            email:body.email,
+            password:body.password,
+            name:body.name
         }
-        //HASH PASSWORD
-        const salt =await bcrypt.genSalt(10);
-        const hashedPassword=await bcrypt.hash(password,salt)
 
-        // CREATE USER
-        const result =await db.query('INSERT INTO users (email,password,name) VALUES($1,$2,$3) RETURNING *',[email,hashedPassword,name]);
-        const userCreated= result.rows[0];
+        const result=await authServices.userRegister(dataUser);
 
-        const token=jwt.sign(
-            {id:userCreated.id, email:userCreated.email},
-            process.env.JWT_SECRET,
-            {expiresIn:process.env.JWT_EXPIRES_IN||'12H'}
-        );
-        //RESPONSE
         res.status(HTTP_STATUS.CREATED).json({
             success:true,
-            data:{
-                userCreated:{
-                    id:userCreated.id,
-                    email:userCreated.email,
-                    name:userCreated.name,
-                    created_at:userCreated.created_at
-                },
-                token
-            }
+            message:'User Registered Successfully',
+            data:result
         });
     } catch (error) {
         next(error);
@@ -47,31 +27,17 @@ const register=async (req,res,next)=>{
 
 const login= async (req,res,next)=>{
     try {
-        const {email,password}=req.body;
+        const body=req.body;
+        const userData={
+            email:body.email,
+            password:body.password
+        }
         
-        //Comprobamos credenciales validas
-        const queryGetData= await db.query(
-            `SELECT id,email, password,role FROM users WHERE email=$1`,
-            [email]
-        );
-
-        const user=queryGetData.rows[0];
-        
-        if(!user) return error(HTTP_STATUS.AUTHORIZATION_REQUIRED,MESSAGES_OPERATION.CREDENTIALS_INVALID,next)
-        const checkPass= await bcrypt.compare(password, user.password);
-        if(!checkPass) return error(HTTP_STATUS.AUTHORIZATION_REQUIRED,MESSAGES_OPERATION.CREDENTIALS_INVALID,next)
-
-
-        const accesstoken=jwt.sign(
-            {id:user.id,gmail:user.email,role:user.role},
-            process.env.JWT_SECRET,
-            {expiresIn:process.env.JWT_EXPIRES_IN||'15m'}
-        )
-
+        const result= await authServices.userLogin(userData);
         res.status(HTTP_STATUS.OK).json({
             success:true,
             message:MESSAGES_OPERATION.LOGIN_SUCCESSFULLY,
-            token:accesstoken
+            token:result
         })
 
     } catch (error) {

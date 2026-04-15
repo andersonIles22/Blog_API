@@ -11,7 +11,7 @@ router.post('/',authMiddleware,validatePost,postControllers.createPosts);
 
 router.get('/',validateQueryGetPosts,postControllers.getAllPost)
 
-router.patch('/:post_id',authMiddleware,isOwnerOrRole('posts',['admin']),validateUpdate,postControllers.updatePost)
+router.patch('/:post_id',validateIdPost,authMiddleware,isOwnerOrRole('posts',['admin']),validateUpdate,postControllers.updatePost)
 
 router.delete('/:post_id',validateIdPost,authMiddleware,isOwnerOrRole('posts',['admin']),postControllers.deletePost)
 

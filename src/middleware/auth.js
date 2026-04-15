@@ -3,6 +3,7 @@ const { error } = require('./errorHandler');
 const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
 const db=require('../config/database');
+const postsService=require('../services/postsService')
 
 // Configuración centralizada de recursos
 const RESOURCE_CONFIG = {
@@ -51,24 +52,25 @@ const isOwnerOrRole=(resourceType, allowedRoles = [])=>{
         const resourceId=req.params[config.paramName];
 
         if(allowedRoles.includes(role)) return next();
-        
-        const query=`
-            SELECT ${config.ownerField} FROM ${resourceType}
-            WHERE id=$1
-        `;
-
-        const queryGetResource= await db.query(
-            query,
-            [resourceId]
-        );
-
-        if (queryGetResource.rows.length === 0) {
-            return error(HTTP_STATUS.NOT_FOUND,`${resourceType.slice(0, -1)} not found`,next);
+        const data={
+            field:config.ownerField,
+            resourceType:resourceType,
+            resourceId:resourceId
         }
-        
-        const ownerId=queryGetResource.rows[0][config.ownerField];
-        if(ownerId!==id) return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.DENIED_ACCESS,next);
 
+        // Usar el servicio segun el recurso establecido (posts, comments)
+        const services={
+            posts:postsService
+        }
+
+        const currentService=services[resourceType];
+        // Conocer si existe el recurso por id
+        await currentService.findById(resourceId)
+        
+        // Comprobación de que el usario es el propietario del recurso.
+        const getOwnerIdOfResource= await postsService.checkOwnerShip(data)
+
+        if(getOwnerIdOfResource!==id) return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.DENIED_ACCESS,next);
 
         next()
     }

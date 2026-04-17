@@ -1,3 +1,4 @@
+const { query } = require('express-validator');
 const db=require('../config/database');
 const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
@@ -125,16 +126,11 @@ const findAllPosts=async (params) => {
     const queryGetAllPost= await db.query(
         QueryAllPost, valuesArr
     )
-    const numberOfPosts=queryGetAllPost.rows[0].count;
+    const numberOfPosts=parseInt(queryGetAllPost.rows[0].count);
     const numberOfPages=Math.ceil(numberOfPosts/limit);
 
-    let message;
-    let data;
+    if(page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
 
-    if(numberOfPosts>0 && page>numberOfPages){
-        message="Not posts found for this page"
-        data=[]
-    };    
 
     // LIMIT y OFFSET al final para evitar problemas con el conteo de posts aplicando o no los filtros
     let limitePage="";
@@ -159,14 +155,14 @@ const findAllPosts=async (params) => {
 
     return {
         success:true,
-        message:message||'Get Data Successfully',
+        message:'Get Data Successfully',
         pagination:{
             totalPosts:numberOfPosts,
             totalPages:numberOfPages,
             currentPage:page,
             pageSize:limit
         },
-        data:data||queryGetPostLimited.rows
+        data:queryGetPostLimited.rows
     }
 }
 
@@ -213,11 +209,28 @@ const checkOwnerShip=async (data) => {
 
     return getOwnerIdOfResource.rows[0][field];
 }
+
+const checkExists=async (postId) => {
+    try {
+        const exists=await db.query(`
+            SELECT EXISTS(
+                SELECT 1 FROM posts WHERE id=$1
+            )
+            `,
+            [postId]
+        )
+        return exists.rows[0].exists
+    } catch (error) {
+        throw error
+    }
+}
+
 module.exports={
     createPost,
     findById,
     findAllPosts,
     update,
     deleteResource,
-    checkOwnerShip
+    checkOwnerShip,
+    checkExists
 };

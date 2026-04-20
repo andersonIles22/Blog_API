@@ -54,7 +54,7 @@ const getAll=async (dataPost) => {
         const totalCount= await countComments(post_id);
         
         const numberOfPages=Math.ceil(totalCount/limit)||1;
-        if(totalCount>0 && page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
+        if(page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
 
         return {
             success:true,

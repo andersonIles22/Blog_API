@@ -120,7 +120,7 @@ const findAllPosts=async (params) => {
 
     const numberOfPages=Math.ceil(totalCount/limit)||1;
 
-    if(totalCount>0 && page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
+    if(page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
 
 
     // LIMIT y OFFSET al final para evitar problemas con el conteo de posts aplicando o no los filtros

@@ -6,7 +6,7 @@ const postsService=require('../services/postsService');
 
 const create=async (dataPost) => {
     const {post_id,author_comment_id,post_comment}=dataPost;
-    try {
+
         // Validamos la existencia del post 
         // y evitar error en la creación de comentario
         const existPosts=await postsService.checkExists(post_id)
@@ -20,55 +20,49 @@ const create=async (dataPost) => {
     return {
         ...commentOnPostQuery.rows[0]
     }
-    } catch (error) {
-        throw error
-    }
+
 }
 
 const getAll=async (dataPost) => {
     const {post_id,page,limit,offset}=dataPost;
 
-    try {
-        // Validamos la existencia del post para evitar 
-        // ambiguedad  con la interpretación del cliente
-        const existPosts=await postsService.checkExists(post_id)
-        if(!existPosts) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
-        
-        const queryGetSomeCommentsOnPost=await db.query(
-            `SELECT 
-                u.id,
-                u.name as author,
-                com.id,
-                com.content
-            FROM users u JOIN comments com
-            ON u.id=com.author_id
-            WHERE com.post_id=$1
-            ORDER BY com.created_at
-            LIMIT $2 OFFSET $3
-            `,
-            [post_id,limit,offset]
-        );
-        const comments=queryGetSomeCommentsOnPost.rows;
+    // Validamos la existencia del post para evitar 
+    // ambiguedad  con la interpretación del cliente
+    const existPosts=await postsService.checkExists(post_id)
+    if(!existPosts) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
+    
+    const queryGetSomeCommentsOnPost=await db.query(
+        `SELECT 
+            u.id,
+            u.name as author,
+            com.id,
+            com.content
+        FROM users u JOIN comments com
+        ON u.id=com.author_id
+        WHERE com.post_id=$1
+        ORDER BY com.created_at
+        LIMIT $2 OFFSET $3
+        `,
+        [post_id,limit,offset]
+    );
+    const comments=queryGetSomeCommentsOnPost.rows;
 
-        // Obtenemos el numero total de comentarios para calcular la paginación
-        const totalCount= await countComments(post_id);
-        
-        const numberOfPages=Math.ceil(totalCount/limit)||1;
-        if(page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
+    // Obtenemos el numero total de comentarios para calcular la paginación
+    const totalCount= await countComments(post_id);
+    
+    const numberOfPages=Math.ceil(totalCount/limit)||1;
+    if(page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
 
-        return {
-            success:true,
-            message:'Get Data Successfully',
-            pagination:{
-                totalComments:totalCount,
-                totalPages:numberOfPages,
-                currentPage:page,
-                pageSize:limit
-            },
-            data:comments
-        }
-    } catch (error) {
-        throw error
+    return {
+        success:true,
+        message:'Get Data Successfully',
+        pagination:{
+            totalComments:totalCount,
+            totalPages:numberOfPages,
+            currentPage:page,
+            pageSize:limit
+        },
+        data:comments
     }
 }
 

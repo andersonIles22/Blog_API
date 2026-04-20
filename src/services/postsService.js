@@ -159,31 +159,23 @@ const findAllPosts=async (params) => {
 
 const update= async(post)=>{
     const {post_id,title,content}=post;
-    try {
-        const queryUpdatePost= await db.query(
-            `UPDATE posts
-            SET title=COALESCE($1,title), content=COALESCE($2,content)
-            WHERE id=$3
-            RETURNING *`,
-            [title,content,post_id]
-        );
-        if (!queryUpdatePost.rows[0]) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND);   
-    } catch (error) {
-        throw error
-    }
+    const queryUpdatePost= await db.query(
+        `UPDATE posts
+        SET title=COALESCE($1,title), content=COALESCE($2,content)
+        WHERE id=$3
+        RETURNING *`,
+        [title,content,post_id]
+    );
+    if (!queryUpdatePost.rows[0]) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND);   
 }
 
 const deleteResource=async (postId) => {
-        //Verificamos si el post existe 
-    try {
-        const postDeleteQuery= await db.query(
-        `DELETE FROM posts WHERE id=$1 RETURNING *`,
-        [postId]
-        );
-        if (!postDeleteQuery.rows[0]) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND);
-    } catch (error) {
-        throw error
-    }
+    //Verificamos si el post existe 
+    const postDeleteQuery= await db.query(
+    `DELETE FROM posts WHERE id=$1 RETURNING *`,
+    [postId]
+    );
+    if (!postDeleteQuery.rows[0]) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND);
 
 }
 const checkOwnerShip=async (data) => {
@@ -202,38 +194,29 @@ const checkOwnerShip=async (data) => {
 }
 
 const checkExists=async (postId) => {
-    try {
-        const exists=await db.query(`
-            SELECT EXISTS(
-                SELECT 1 FROM posts WHERE id=$1
-            )
-            `,
-            [postId]
+    const exists=await db.query(`
+        SELECT EXISTS(
+            SELECT 1 FROM posts WHERE id=$1
         )
-        return exists.rows[0].exists
-    } catch (error) {
-        throw error
-    }
+        `,
+        [postId]
+    )
+    return exists.rows[0].exists
 }
 
 
 const countPosts= async (conditions,arr) => {
-    try {
-        let getCountAllPostQuery= `
-        SELECT COUNT(DISTINCT p.id)
-        FROM posts p
-        LEFT JOIN post_categories p_c ON p.id=p_c.post_id
-        LEFT JOIN categories cat ON p_c.category_id=cat.id 
-        ${conditions}`;
+    let getCountAllPostQuery= `
+    SELECT COUNT(DISTINCT p.id)
+    FROM posts p
+    LEFT JOIN post_categories p_c ON p.id=p_c.post_id
+    LEFT JOIN categories cat ON p_c.category_id=cat.id 
+    ${conditions}`;
 
-        const result= await db.query(
-            getCountAllPostQuery, arr
-        );
-        return parseInt(result.rows[0].count);
-
-    } catch (error) {
-        throw error
-    }
+    const result= await db.query(
+        getCountAllPostQuery, arr
+    );
+    return parseInt(result.rows[0].count);
 }
 module.exports={
     createPost,

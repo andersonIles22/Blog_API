@@ -25,16 +25,6 @@ const create=async (dataPost) => {
     }
 }
 
-const countComments=async (postId) => {
-    const post_id=postId;
-    const getCountCommentsQuery= await db.query(
-        `SELECT count(*) FROM users u JOIN comments com
-        ON u.id=com.author_id
-        WHERE com.post_id=$1`,
-        [post_id]
-    )
-    return parseInt(getCountCommentsQuery.rows[0].count);
-}
 const getAll=async (dataPost) => {
     const {post_id,page,limit,offset}=dataPost;
 
@@ -47,7 +37,7 @@ const getAll=async (dataPost) => {
         const queryGetSomeCommentsOnPost=await db.query(
             `SELECT 
                 u.id,
-                u.name,
+                u.name as author,
                 com.id,
                 com.content
             FROM users u JOIN comments com
@@ -61,15 +51,16 @@ const getAll=async (dataPost) => {
         const comments=queryGetSomeCommentsOnPost.rows;
 
         // Obtenemos el numero total de comentarios para calcular la paginación
-        const count= await countComments(post_id);
-        const numberOfPages=Math.ceil(count/limit);
-        if(page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
+        const totalCount= await countComments(post_id);
+        
+        const numberOfPages=Math.ceil(totalCount/limit)||1;
+        if(totalCount>0 && page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
 
         return {
             success:true,
             message:'Get Data Successfully',
             pagination:{
-                totalComments:count,
+                totalComments:totalCount,
                 totalPages:numberOfPages,
                 currentPage:page,
                 pageSize:limit
@@ -82,8 +73,7 @@ const getAll=async (dataPost) => {
 }
 
 
-
-// No es lógica de negocio
+//#region No Logic 
     //En este caso es un transformador de datos, 
     // para la paginación de datos
 const buildPostData=async (data, post_id) => {
@@ -96,6 +86,18 @@ const buildPostData=async (data, post_id) => {
         offset: (page-1)*limit
     };
 };
+
+const countComments=async (postId) => {
+    const post_id=postId;
+    const getCountCommentsQuery= await db.query(
+        `SELECT COUNT(*) 
+        FROM comments com JOIN posts p 
+        ON com.post_id=p.id 
+        WHERE p.id=$1`,
+        [post_id]
+    )
+    return parseInt(getCountCommentsQuery.rows[0].count);
+}
 module.exports={
     create,
     getAll,

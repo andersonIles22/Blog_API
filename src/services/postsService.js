@@ -116,20 +116,11 @@ const findAllPosts=async (params) => {
     }
     // Se establece una consulta a la db para obtener el numero total 
     // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET
-    let QueryAllPost= `
-        SELECT COUNT(DISTINCT p.id)
-        FROM posts p
-        LEFT JOIN post_categories p_c ON p.id=p_c.post_id
-        LEFT JOIN categories cat ON p_c.category_id=cat.id 
-        ${whereConditions}`
+    const totalCount= await countPosts(whereConditions,valuesArr)
 
-    const queryGetAllPost= await db.query(
-        QueryAllPost, valuesArr
-    )
-    const numberOfPosts=parseInt(queryGetAllPost.rows[0].count);
-    const numberOfPages=Math.ceil(numberOfPosts/limit);
+    const numberOfPages=Math.ceil(totalCount/limit)||1;
 
-    if(page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
+    if(totalCount>0 && page>numberOfPages) throw new AppError(MESSAGES_OPERATION.NUMBER_PAGE_NOT_FOUND,HTTP_STATUS.BAD_REQUEST);
 
 
     // LIMIT y OFFSET al final para evitar problemas con el conteo de posts aplicando o no los filtros
@@ -157,7 +148,7 @@ const findAllPosts=async (params) => {
         success:true,
         message:'Get Data Successfully',
         pagination:{
-            totalPosts:numberOfPosts,
+            totalPosts:totalCount,
             totalPages:numberOfPages,
             currentPage:page,
             pageSize:limit
@@ -225,6 +216,25 @@ const checkExists=async (postId) => {
     }
 }
 
+
+const countPosts= async (conditions,arr) => {
+    try {
+        let getCountAllPostQuery= `
+        SELECT COUNT(DISTINCT p.id)
+        FROM posts p
+        LEFT JOIN post_categories p_c ON p.id=p_c.post_id
+        LEFT JOIN categories cat ON p_c.category_id=cat.id 
+        ${conditions}`;
+
+        const result= await db.query(
+            getCountAllPostQuery, arr
+        );
+        return parseInt(result.rows[0].count);
+
+    } catch (error) {
+        throw error
+    }
+}
 module.exports={
     createPost,
     findById,

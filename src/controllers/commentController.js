@@ -31,7 +31,7 @@ const getPostcomments=async (req,res,next) => {
         const result=await commentsService.getAll(dataPost)
         
         res.status(HTTP_STATUS.OK).json({
-            result
+            ...result
         });
 
     } catch (error) {

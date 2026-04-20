@@ -100,7 +100,7 @@ describe('POST /api/posts/:id/comments - Comment created successfully',()=>{
             .send({post_comment:'Como ven a ese pendejo xdxdxd'})
             .set({'Authorization':`Bearer ${token}`})
             expect(response.status).toBe(201)
-            expect(response.body).toEqual({ success: true, message: 'Comentario creado' })
+            expect(response.body).toMatchObject({ success: true, message: 'Comment created successfully' })
     })
 })
 

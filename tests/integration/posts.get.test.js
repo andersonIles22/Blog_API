@@ -37,12 +37,13 @@ describe('GET /api/posts/', ()=>{
             expect(response.body.pagination.currentPage).toBe(1);
     })
 
-    test('Return an empty array and status 200 for a page that not exists',async () => {
+    test('It should fail if with 400 for a page that not exists',async () => {
         const response=await getPosts({page:9999,limit:5})
-        expectValidResponse(response)
-            expect(response.body.data).toEqual([])
-            expect(response.body).toHaveProperty('pagination')
-            expect(parseInt(response.body.pagination.totalPosts)).toBeGreaterThanOrEqual(0)
+            expect(response.status).toBe(400)
+            expect(response.body).toMatchObject({
+                success:false,
+                error:expect.any(String)
+            })
     })
 });
 

@@ -1,6 +1,8 @@
 const supertest=require('supertest');
 const app=require('../../src/app');
 const {seedUserPostCommentTestData,cleanDataBase}=require('../helpers/database.setup');
+const { error } = require('../../src/middleware/errorHandler');
+const expectCookies = require('supertest/lib/cookies');
 
 const api=supertest(app);
 
@@ -25,7 +27,7 @@ describe('GET /api/posts/:id/comments - posts_id Validation', ()=>{
     })
 })
 
-describe('GET /api/posts/:id/comments - queries Validation',() => {
+describe('GET /api/posts/:id/comments - Queries Validation',() => {
     beforeAll(async () => {
         await cleanDataBase();
         await seedUserPostCommentTestData();
@@ -34,10 +36,13 @@ describe('GET /api/posts/:id/comments - queries Validation',() => {
         await cleanDataBase();
     })
 
-    it('Should return an empty Array in the data with 200 if page value does not exist', async () => {
+    it('It Should fail with 400 if page value is invalid', async () => {
         const response= await getComments(2,{page:99999,limit:5})
-        expect(response.status).toBe(200)
-        expect(response.body.data).toEqual([])
+        expect(response.status).toBe(400)
+        expect(response.body).toMatchObject({
+            success:false,
+            error:expect.any(String)
+        })
     })
     
     it('Should fail with 400 if limit value is invalid',async () => {

@@ -1,49 +1,23 @@
-const { query } = require('express-validator');
 const db=require('../config/database');
 const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
 const AppError=require('../utils/appError')
-
+const postRepository=require('../repositories/postsRepository')
 
 const createPost=async (postData) => {
     const client=await db.connect();
     try {
-        const {title, content, published, category_ids,author_id}=postData;
      //Iniciar Transacción
-
         await client.query('BEGIN');
-        const insertPostQuery=`
-        INSERT INTO  posts (title, content, author_id, published)
-        VALUES ($1,$2,$3,$4) 
-        RETURNING *`;
 
-        // Consulta Principal
-        const postResult=await client.query(
-            insertPostQuery,
-            [title,content,author_id,published||false]
-        )
-
-        const postId= postResult.rows[0].id;
-
-        if(category_ids && category_ids.length>0){
-
-            const placeholders=category_ids.map((values,i)=>{
-                return `($${i*2+1},$${i*2+2})`;
-            }).join(',');
-
-            const valuesInsert=category_ids.flatMap((category_id)=>[postId,category_id]);
-            // Sub consulta
-            const insertCategoryIdsQuery=`
-            INSERT INTO post_categories (post_id,category_id)
-            VALUES ${placeholders} RETURNING *`;
-
-            await client.query(insertCategoryIdsQuery,valuesInsert); 
-        }
+        const postCreationQueryResult= await postRepository.create(postData,client);
+        const postId=postCreationQueryResult.id;
+        const categoriesInsertQueryResult=await  postRepository.addCatgoriesToPost(postId,postData,client);
+        
         await client.query('COMMIT');
-
         return {
-            ...postResult.rows[0],
-            category_ids:category_ids
+            ...postCreationQueryResult,
+            category_ids:categoriesInsertQueryResult
         };
     } catch (error) {
         await client.query(`ROLLBACK`);
@@ -53,46 +27,19 @@ const createPost=async (postData) => {
     finally{
         client.release();
     } 
-
-
 };
 
 const findById=async (resource_id) => {
-    const getPostQuery=await db.query(
-        `SELECT * FROM posts WHERE id=$1`,
-        [resource_id]
-    );
-    if (!getPostQuery.rows[0]) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
-    return {...getPostQuery.rows[0]};
+    const getPostsQueryResult=await postRepository.getById(resource_id)
+    if (!getPostsQueryResult) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
+    return {...getPostsQueryResult};
 }
 
 const findAllPosts=async (params) => {
+    const {page,limit,author_id,published,category}=params;
+
     const conditionArr=[];
     const valuesArr=[];
-    const baseQuery=
-    `SELECT 
-        p.id,
-        p.title,
-        p.content,
-        json_build_object(
-            'id',u.id,
-            'name',u.name
-        ) as author,
-        COALESCE(
-            JSON_AGG(
-                json_build_object(
-                'id',p_c.category_id,
-                'name',cat.name
-                )
-            ) FILTER (where p_c.category_id IS not NULL)
-        ,'[]')  as category_ids
-    FROM users u
-    JOIN posts p ON u.id=p.author_id
-    LEFT JOIN post_categories p_c ON p.id=p_c.post_id
-    LEFT JOIN categories cat ON p_c.category_id=cat.id
-    `;
-
-    const {page,limit,author_id,published,category}=params;
     // Validamos que los parametros existan y asi establecer las condicionales en caso de indicar en la ruta
     if(author_id){
         valuesArr.push(author_id)
@@ -114,6 +61,7 @@ const findAllPosts=async (params) => {
     if(conditionArr.length>0){
         whereConditions=` WHERE ${whereConditions}`
     }
+
     // Se establece una consulta a la db para obtener el numero total 
     // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET
     const totalCount= await countPosts(whereConditions,valuesArr)
@@ -132,17 +80,8 @@ const findAllPosts=async (params) => {
         limitePage=`LIMIT $${number-1} OFFSET $${number}`
     }
 
-    let resultQuery=`
-        ${baseQuery} 
-        ${whereConditions} 
-        GROUP BY p.id, u.id
-        ORDER BY p.created_at DESC 
-        ${limitePage}`;
-
     // Consulta con todos los parametros establecidos en la query de la ruta
-    const queryGetPostLimited=await db.query(
-        resultQuery,valuesArr
-    );
+    const getPostQueryResult=await postRepository.getAll(whereConditions,limitePage,valuesArr)
 
     return {
         success:true,
@@ -153,7 +92,7 @@ const findAllPosts=async (params) => {
             currentPage:page,
             pageSize:limit
         },
-        data:queryGetPostLimited.rows
+        data:getPostQueryResult
     }
 }
 

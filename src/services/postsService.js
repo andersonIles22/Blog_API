@@ -3,7 +3,7 @@ const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
 const AppError=require('../utils/appError')
 const postRepository=require('../repositories/postsRepository')
-const authRepository=require('../repositories/authRepository')
+const authRepository=require('../repositories/authRepository');
 
 const createPost=async (postData) => {
     const client=await db.connect();
@@ -64,12 +64,13 @@ const findAllPosts=async (params) => {
     }
 
     // Validamos la existencia del propietario para poder ejecutar la consulta.
-    const checkIfExistsAuthor= await authRepository.checkAuthor(author_id)
-    if(!checkIfExistsAuthor) throw new AppError(MESSAGES_OPERATION.AUTHOR_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
-
+    if(author_id){    
+        const checkIfExistsAuthor= await authRepository.checkAuthor(author_id)
+        if(!checkIfExistsAuthor) throw new AppError(MESSAGES_OPERATION.AUTHOR_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
+    }
     // Se establece una consulta a la db para obtener el numero total 
     // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET
-    const totalCount= await countPosts(whereConditions,valuesArr)
+    const totalCount= await postRepository.countPosts(whereConditions,valuesArr)
 
     const numberOfPages=Math.ceil(totalCount/limit)||1;
 
@@ -101,73 +102,29 @@ const findAllPosts=async (params) => {
     }
 }
 
-const update= async(post)=>{
-    const {post_id,title,content}=post;
-    const queryUpdatePost= await db.query(
-        `UPDATE posts
-        SET title=COALESCE($1,title), content=COALESCE($2,content)
-        WHERE id=$3
-        RETURNING *`,
-        [title,content,post_id]
-    );
-    if (!queryUpdatePost.rows[0]) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND);   
+const updateResource= async(dataPost)=>{
+    const {post_id,existingPost=null}=dataPost;
+    const checkExistsResource=existingPost|| await findById(post_id);
+    if(!checkExistsResource) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND) 
+
+    const result= await postRepository.update(dataPost)
+    return result;
 }
 
-const deleteResource=async (postId) => {
-    //Verificamos si el post existe 
-    const postDeleteQuery= await db.query(
-    `DELETE FROM posts WHERE id=$1 RETURNING *`,
-    [postId]
-    );
-    if (!postDeleteQuery.rows[0]) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND);
-
-}
-const checkOwnerShip=async (data) => {
-    const {field,resourceType,resourceId}=data;
-    const getOwnerIdQuery=`
-    SELECT ${field} FROM ${resourceType}
-    WHERE id=$1
-    `;
-
-    const getOwnerIdOfResource= await db.query(
-        getOwnerIdQuery,
-        [resourceId]
-    );
-
-    return getOwnerIdOfResource.rows[0][field];
+const deleteResource=async (dataPost) => {
+    //Validamos existencia del resurso antes de eliminar
+    const {postId,existingPost=null}=dataPost;
+    const checkExistsResource=existingPost|| await findById(postId);
+    if(!checkExistsResource) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND) 
+    // Eliminación del recurso
+    const result= await postRepository.deletePost(postId)
+    return result;
 }
 
-const checkExists=async (postId) => {
-    const exists=await db.query(`
-        SELECT EXISTS(
-            SELECT 1 FROM posts WHERE id=$1
-        )
-        `,
-        [postId]
-    )
-    return exists.rows[0].exists
-}
-
-
-const countPosts= async (conditions,arr) => {
-    let getCountAllPostQuery= `
-    SELECT COUNT(DISTINCT p.id)
-    FROM posts p
-    LEFT JOIN post_categories p_c ON p.id=p_c.post_id
-    LEFT JOIN categories cat ON p_c.category_id=cat.id 
-    ${conditions}`;
-
-    const result= await db.query(
-        getCountAllPostQuery, arr
-    );
-    return parseInt(result.rows[0].count);
-}
 module.exports={
     createPost,
     findById,
     findAllPosts,
-    update,
+    updateResource,
     deleteResource,
-    checkOwnerShip,
-    checkExists
 };

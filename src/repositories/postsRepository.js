@@ -79,9 +79,77 @@ const getAll=async (whereConditions,limitePage,valuesArr) => {
     return getAllResult.rows;
 }
 
+const update=async (postData) => {
+    const {post_id,title,content}=postData;
+    const postUpdateQuery= await db.query(
+        `UPDATE posts
+        SET title=COALESCE($1,title), content=COALESCE($2,content)
+        WHERE id=$3
+        RETURNING *`,
+        [title,content,post_id]
+    );
+    return postUpdateQuery.rows[0];
+}
+
+const deletePost=async (postId) => {
+    const postDeleteQuery= await db.query(`
+        DELETE FROM posts
+        WHERE id=$1
+        RETURNING id,title
+        `,
+        [postId]
+    )
+    return postDeleteQuery.rows[0];
+}
+
+const isOwner=async (data) => {
+    const {field,resourceType,resourceId}=data;
+    const getOwnerIdQuery=`
+    SELECT ${field} FROM ${resourceType}
+    WHERE id=$1
+    `;
+
+    const getOwnerIdOfResource= await db.query(
+        getOwnerIdQuery,
+        [resourceId]
+    );
+
+    return getOwnerIdOfResource.rows[0][field];
+}
+
+const exists=async (postId) => {
+    const exists=await db.query(`
+        SELECT EXISTS(
+            SELECT 1 FROM posts WHERE id=$1
+        )
+        `,
+        [postId]
+    )
+    return exists.rows[0].exists
+};
+
+const countPosts= async (conditions,arr) => {
+    let getCountAllPostQuery= `
+    SELECT COUNT(DISTINCT p.id)
+    FROM posts p
+    LEFT JOIN post_categories p_c ON p.id=p_c.post_id
+    LEFT JOIN categories cat ON p_c.category_id=cat.id 
+    ${conditions}`;
+
+    const result= await db.query(
+        getCountAllPostQuery, arr
+    );
+    return parseInt(result.rows[0].count);
+}
 module.exports={
     create,
     addCatgoriesToPost,
     getById,
-    getAll
+    getAll,
+    update,
+    deletePost,
+    isOwner,
+    exists,
+    countPosts
+    
 }

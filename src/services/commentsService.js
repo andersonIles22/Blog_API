@@ -2,14 +2,14 @@ const db=require('../config/database');
 const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
 const AppError = require('../utils/appError');
-const postsService=require('../services/postsService');
+const postsRepository=require('../repositories/postsRepository');
 
 const create=async (dataPost) => {
     const {post_id,author_comment_id,post_comment}=dataPost;
 
         // Validamos la existencia del post 
         // y evitar error en la creación de comentario
-        const existPosts=await postsService.checkExists(post_id)
+        const existPosts=await postsRepository.exists(post_id)
         if(!existPosts) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
 
         const commentOnPostQuery=await db.query(
@@ -28,7 +28,7 @@ const getAll=async (dataPost) => {
 
     // Validamos la existencia del post para evitar 
     // ambiguedad  con la interpretación del cliente
-    const existPosts=await postsService.checkExists(post_id)
+    const existPosts=await postsRepository.exists(post_id)
     if(!existPosts) throw new AppError(MESSAGES_OPERATION.POST_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
     
     const queryGetSomeCommentsOnPost=await db.query(

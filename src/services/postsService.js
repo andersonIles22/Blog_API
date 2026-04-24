@@ -3,6 +3,7 @@ const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
 const AppError=require('../utils/appError')
 const postRepository=require('../repositories/postsRepository')
+const authRepository=require('../repositories/authRepository')
 
 const createPost=async (postData) => {
     const client=await db.connect();
@@ -61,6 +62,10 @@ const findAllPosts=async (params) => {
     if(conditionArr.length>0){
         whereConditions=` WHERE ${whereConditions}`
     }
+
+    // Validamos la existencia del propietario para poder ejecutar la consulta.
+    const checkIfExistsAuthor= await authRepository.checkAuthor(author_id)
+    if(!checkIfExistsAuthor) throw new AppError(MESSAGES_OPERATION.AUTHOR_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
 
     // Se establece una consulta a la db para obtener el numero total 
     // de publicaciones en base a las condiciones establecidas antes de agregar los parametros LIMIT y OFFSET

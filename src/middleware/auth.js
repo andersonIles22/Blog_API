@@ -3,7 +3,7 @@ const { error } = require('./errorHandler');
 const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
 const db=require('../config/database');
-const postsService=require('../services/postsService')
+const postsRepository=require('../repositories/postsRepository')
 
 // Configuración centralizada de recursos
 const RESOURCE_CONFIG = {
@@ -59,19 +59,19 @@ const isOwnerOrRole=(resourceType, allowedRoles = [])=>{
         }
 
         // Usar el servicio segun el recurso establecido (posts, comments)
-        const services={
-            posts:postsService
+        const repositories={
+            posts:postsRepository
         }
 
-        const currentService=services[resourceType];
+        const currentRepository=repositories[resourceType];
         // Conocer si existe el recurso por id
-        await currentService.findById(resourceId)
+        const resource=await currentRepository.getById(resourceId)
         
         // Comprobación de que el usario es el propietario del recurso.
-        const getOwnerIdOfResource= await postsService.checkOwnerShip(data)
+        const getOwnerIdOfResource= await postsRepository.isOwner(data)
 
         if(getOwnerIdOfResource!==id) return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.DENIED_ACCESS,next);
-
+        req.resource=resource;
         next()
     }
     catch(error){

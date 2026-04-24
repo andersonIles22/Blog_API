@@ -72,13 +72,15 @@ const updatePost=async (req,res,next) => {
         const dataPost={
             post_id:req.params.post_id,
             title:req.body.title,
-            content:req.body.content
+            content:req.body.content,
+            existingPost:req.resource
         }
-        const result=await postsService.update(dataPost)
+        const result=await postsService.updateResource(dataPost)
 
         res.status(HTTP_STATUS.OK).json({
             success:true,
             message:MESSAGES_OPERATION.SUCCESFUL_OPERATION,
+            data:result
         });
 
     } catch (error) {
@@ -90,15 +92,17 @@ const updatePost=async (req,res,next) => {
 //#region DELETE
 const deletePost=async(req,res,next)=>{
     try {
-        const postId=req.params.post_id;
-        //Comprobar que existe el post
-        await postsService.findById(postId)
+        const dataPost={
+            postId:req.params.post_id,
+            existingPost:req.resource
+        }
         // Service de elimación de post
-        await postsService.deleteResource(postId)
+        const result=await postsService.deleteResource(dataPost)
         res.status(HTTP_STATUS.OK).json(
         {
             success:true,
-            message:MESSAGES_OPERATION.SUCCESFUL_OPERATION
+            message:MESSAGES_OPERATION.SUCCESFUL_OPERATION,
+            data:result
         }
         );
 

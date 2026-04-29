@@ -1,17 +1,17 @@
-const db=require('../config/database');
 const bcrypt=require('bcryptjs');
 const jwt=require('jsonwebtoken');
 const {HTTP_STATUS}=require('../constants/httpStatusCode');
 const {MESSAGES_OPERATION}=require('../constants/statusMessages');
 const AppError = require('../utils/appError');
-
+const userRepository=require('../repositories/userRepository');
+const authRepository=require('../repositories/authRepository');
 
 const userRegister=async (dataUser) => {
     const {email,password,name}=dataUser;
 
-    const getUserById=await db.query('SELECT id FROM users WHERE email=$1',[email]);
+    const getUserById=await userRepository.checkByEmail(email);
     
-    if(getUserById.rows.length>0){
+    if(getUserById){
         throw new AppError(MESSAGES_OPERATION.EMAIL_ALREADY_EXIST,HTTP_STATUS.CONFLICT);
     }
     //HASH PASSWORD
@@ -19,8 +19,12 @@ const userRegister=async (dataUser) => {
     const hashedPassword=await bcrypt.hash(password,salt)
 
     // CREATE USER
-    const registerUserQuery =await db.query('INSERT INTO users (email,password,name) VALUES($1,$2,$3) RETURNING *',[email,hashedPassword,name]);
-    const userCreated= registerUserQuery.rows[0];
+    const userData={
+        email:email,
+        name:name,
+        hashedPassword:hashedPassword
+    }
+    const userCreated =await authRepository.register(userData)
 
     const token=jwt.sign(
         {id:userCreated.id, email:userCreated.email},
@@ -41,12 +45,7 @@ const userRegister=async (dataUser) => {
 const userLogin=async (userData) => {
     const {email, password}=userData;
 
-    const getUserByIdQuery= await db.query(
-            `SELECT id,email, password,role FROM users WHERE email=$1`,
-            [email]
-        );
-
-    const user=getUserByIdQuery.rows[0];
+    const user=await authRepository.login(email);
     
     if(!user) throw new AppError(MESSAGES_OPERATION.CREDENTIALS_INVALID,HTTP_STATUS.AUTHORIZATION_REQUIRED);
 

@@ -3,7 +3,7 @@ const { HTTP_STATUS } = require('../constants/httpStatusCode');
 const { MESSAGES_OPERATION } = require('../constants/statusMessages');
 const AppError=require('../utils/appError')
 const postRepository=require('../repositories/postsRepository')
-const authRepository=require('../repositories/authRepository');
+const userRepository=require('../repositories/userRepository');
 
 const createPost=async (postData) => {
     const client=await db.connect();
@@ -65,7 +65,7 @@ const findAllPosts=async (params) => {
 
     // Validamos la existencia del propietario para poder ejecutar la consulta.
     if(author_id){    
-        const checkIfExistsAuthor= await authRepository.checkAuthor(author_id)
+        const checkIfExistsAuthor= await userRepository.checkAuthor(author_id)
         if(!checkIfExistsAuthor) throw new AppError(MESSAGES_OPERATION.AUTHOR_NOT_FOUND,HTTP_STATUS.NOT_FOUND)
     }
     // Se establece una consulta a la db para obtener el numero total 

@@ -1,10 +1,13 @@
 const postsService=require('../../src/services/postsService');
-const postsRepository=require('../../src/repositories/postsRepository');
+const postRepository=require('../../src/repositories/postsRepository');
+const userRepository=require('../../src/repositories/userRepository');
+const { param } = require('../../src/app');
 
-
+jest.mock('../../src/repositories/userRepository')
 jest.mock('../../src/repositories/postsRepository');
 
-describe('GET api/posts - Test One',()=>{
+
+describe('GET api/posts - Get all Posts',()=>{
     const mockPosts=[{
         id:1,
         title:'La ballena azul',
@@ -20,21 +23,41 @@ describe('GET api/posts - Test One',()=>{
         published:true
 
     }]
+
+    const mockCondition=`p.author_id=$1 AND p.published=$2`
+    const mockValues=[1,true]
     beforeEach(() => { 
-        jest.clearAllMocks(); 
-        postsRepository.getAll.mockResolvedValue(mockPosts)
+        jest.clearAllMocks();   
+        userRepository.checkAuthor.mockResolvedValue(true)
+        postRepository.getAll.mockResolvedValue(mockPosts)
+        postRepository.countPosts(mockCondition,mockValues)
     });
 
     const params={
         page:1,
         limit:3,
-        autho_id:1,
+        author_id:1,
         published:true
     }
 
-    it('Get all posts',async () => {
+    it('Get all post by author and published succesfully',async () => {
         const result =await postsService.findAllPosts(params);
         expect(result.data).toEqual(mockPosts)
-        expect(postsRepository.getAll).toHaveBeenCalledTimes(1)
+        expect(postRepository.getAll).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('GET api/posts/id: - Get post by id',()=>{
+    const mockFailMessage='The Post does not exist'
+    beforeEach(()=>{
+        jest.clearAllMocks();
+        postRepository.getById.mockResolvedValue(null)
+    })
+    
+    const resource_id=44
+    it('it should fail if the post id is invalid ', async () => {
+        await expect(postsService.findById(resource_id)) 
+            .rejects
+            .toThrow(mockFailMessage)
     })
 })

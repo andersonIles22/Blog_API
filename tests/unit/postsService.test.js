@@ -1,7 +1,6 @@
 const postsService=require('../../src/services/postsService');
 const postRepository=require('../../src/repositories/postsRepository');
 const userRepository=require('../../src/repositories/userRepository');
-const { param } = require('../../src/app');
 
 jest.mock('../../src/repositories/userRepository')
 jest.mock('../../src/repositories/postsRepository');
@@ -24,13 +23,11 @@ describe('GET api/posts - Get all Posts',()=>{
 
     }]
 
-    const mockCondition=`p.author_id=$1 AND p.published=$2`
-    const mockValues=[1,true]
     beforeEach(() => { 
         jest.clearAllMocks();   
         userRepository.checkAuthor.mockResolvedValue(true)
+        postRepository.countPosts.mockResolvedValue(2)
         postRepository.getAll.mockResolvedValue(mockPosts)
-        postRepository.countPosts(mockCondition,mockValues)
     });
 
     const params={
@@ -44,6 +41,13 @@ describe('GET api/posts - Get all Posts',()=>{
         const result =await postsService.findAllPosts(params);
         expect(result.data).toEqual(mockPosts)
         expect(postRepository.getAll).toHaveBeenCalledTimes(1)
+    })
+    
+    it("Should fail if author does not exist", async () => {
+        userRepository.checkAuthor.mockResolvedValue(false)
+        await expect(postsService.findAllPosts(params))
+            .rejects
+            .toThrow('Post Author not found')
     })
 })
 

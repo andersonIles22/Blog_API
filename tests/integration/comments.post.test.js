@@ -15,6 +15,7 @@ describe('POST /api/posts/:id/comments/ Input Validations', ()=>{
     let token
     
     beforeAll(async () => {
+        await cleanDataBase()
         user=await seedUserPostCommentTestData();
         token=generateToken(user)
     })
@@ -67,6 +68,7 @@ describe('POST /api/posts/:id/comments - posts_id Validation', ()=>{
     let token
     
     beforeAll(async () => {
+        await cleanDataBase()
         user=await seedUserPostCommentTestData();
         token=generateToken(user)
     })
@@ -88,6 +90,7 @@ describe('POST /api/posts/:id/comments - Comment created successfully',()=>{
     let token
     
     beforeAll(async () => {
+        await cleanDataBase()
         user=await seedUserPostCommentTestData();
         token=generateToken(user)
     })

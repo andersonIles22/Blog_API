@@ -6,7 +6,8 @@ const api=supertest(app);
 
 describe('GET /api/posts/', ()=>{
     beforeAll( async ()=>{
-       const insertData= await seedUsersPostsCategoriesTestData();
+        await cleanDataBase()
+        const insertData= await seedUsersPostsCategoriesTestData();
     });
     afterAll(async ()=>{
         await cleanDataBase();
@@ -50,7 +51,8 @@ describe('GET /api/posts/', ()=>{
 describe('GET /api/posts/:id', ()=>{
     let existingPostId
     beforeAll(async()=>{
-       existingPostId=await seedUsersPostsCategoriesTestData();
+        await cleanDataBase()
+        existingPostId=await seedUsersPostsCategoriesTestData();
     })
 
     afterAll( async () => {
@@ -85,7 +87,8 @@ describe('GET /api/posts/:id', ()=>{
 describe('GET /api/posts/ - Filters',() => {
     let existingPostId
     beforeAll(async()=>{
-       existingPostId=await seedUsersPostsCategoriesTestData();
+        await cleanDataBase()
+        existingPostId=await seedUsersPostsCategoriesTestData();
         await updatePublishedPostTestData();
     })
 

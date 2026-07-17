@@ -7,11 +7,12 @@ const api=supertest(app);
 
 describe('POST /api/auth/register/ - Input Validations',()=>{
 
-    beforeEach(async()=>{
+    beforeAll(async()=>{
+        await cleanDataBase()
         await seedUserTestData();
     })
 
-    afterEach(async () => {
+    afterAll(async () => {
         await cleanDataBase(); 
     })
 
@@ -60,11 +61,12 @@ describe('POST /api/auth/register/ - Input Validations',()=>{
 });
 
 describe('POST /api/auth/register/ - Duplicate Email Validation',() => {
-    beforeEach(async()=>{
+    beforeAll(async()=>{
+    await cleanDataBase()
     await seedUserTestData();
     })
 
-    afterEach(async () => {
+    afterAll(async () => {
         await cleanDataBase(); 
     })
     const baseUrl='/api/auth/register/';
@@ -83,11 +85,12 @@ describe('POST /api/auth/register/ - Duplicate Email Validation',() => {
 })
 
 describe('POST /api/auth/register/ - Register Succesfully',()=>{
-    beforeEach(async()=>{
-      await seedUserTestData();
+    beforeAll(async()=>{
+        await cleanDataBase()
+        await seedUserTestData();
     })
 
-    afterEach(async () => {
+    afterAll(async () => {
         await cleanDataBase(); 
     })
     const baseUrl='/api/auth/register/';
@@ -111,7 +114,8 @@ describe('POST /api/auth/register/ - Register Succesfully',()=>{
 
 describe('POST /api/auth/login - Input Validations', ()=>{
     beforeAll(async()=>{
-      await seedUserTestData();
+        await seedUserTestData();
+        await cleanDataBase()
     })
 
     afterAll(async () => {
@@ -147,7 +151,8 @@ describe('POST /api/auth/login - Input Validations', ()=>{
 describe('Post /api/auth/login - Login Succesful',()=>{
        let check
     beforeAll(async()=>{
-      check=await seedUserTestData();
+        await cleanDataBase()
+        check=await seedUserTestData();
     })
 
     afterAll(async () => {
@@ -179,7 +184,8 @@ describe('Post /api/auth/login - Login Succesful',()=>{
 
 describe('Post /api/auth/login - Login Error ',()=>{
     beforeAll(async()=>{
-      await seedUserTestData();
+        await cleanDataBase()
+        await seedUserTestData();
     })
 
     afterAll(async () => {

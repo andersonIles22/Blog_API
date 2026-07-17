@@ -9,6 +9,7 @@ let userData;
 
 describe('POST /api/post/',()=>{
     beforeAll(async () => {
+        await cleanDataBase()
         userData=await seedUserTestData();
         token= generateToken(userData);
     })

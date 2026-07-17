@@ -1,3 +1,4 @@
+const { map } = require('../../src/app');
 const db=require('../../src/config/database');
 const bcrypt=require('bcryptjs');
 
@@ -15,7 +16,7 @@ const cleanPostTable= async () => {
 }
 
 const closeConnection= async()=>{
-    await db.end();
+    // await db.end();
 }
 
 const seedUserTestData=async () => {
@@ -30,7 +31,7 @@ const seedUserTestData=async () => {
 }
 const seedUsersWithRolePostsTestData=async()=>{
   //Insert Users
-  await db.query(`
+  const getUserInfo=await db.query(`
     INSERT INTO users (email,password,name)
     VALUES ('onlyUser@gmail.com','PasswordxD','El Admin'),
     ('youknowthis@gmail.com','PasswordxD','User Ramdon'),
@@ -43,14 +44,16 @@ const seedUsersWithRolePostsTestData=async()=>{
     WHERE id=1
     `
   );
+  const usersInfo=getUserInfo.rows.map((a)=>a.id);
   await db.query(`
     INSERT INTO posts (title,content,author_id)
-    VALUES ('Life', 'Dime que funciona', 1),
-      ('Dont die','Dime que funciona',1),
-      ('Do not lie to me','Dime que funciona',3),
-      ('The worst party','Dime que funciona',3),
-      ('My house is so big','Dime que funciona',2)
-    `
+    VALUES ('Life', 'Dime que funciona', $1),
+      ('Dont die','Dime que funciona',$1),
+      ('Do not lie to me','Dime que funciona',$3),
+      ('The worst party','Dime que funciona',$3),
+      ('My house is so big','Dime que funciona',$2)
+    `,
+    [usersInfo[0],usersInfo[1],usersInfo[2]]
   );
   const getUsersQuery= await db.query(`
     SELECT id,email,role FROM users
@@ -66,32 +69,40 @@ const seedUsersWithRolePostsTestData=async()=>{
 
 const seedUsersPostsCategoriesTestData = async () => {
   // Usuario de prueba
-  await db.query(`
+  const userResult=await db.query(`
     INSERT INTO users (email, password,name)
     VALUES ('test@example.com', 'Dime que funciona', 'Pepe'),
       ('mano@gmail.com','Dime que funciona','Juan'),
       ('foot@gmail.com','Dime que funciona','Fracisco'),
       ('waos@gmail.com','Dime que funciona','Marta'),
       ('who@gmail.com','Dime que funciona','Laura')
+      RETURNING id
       `);
   
+  const userId1=userResult.rows[0].id;
+  const userId2=userResult.rows[1].id;
+  const userId3=userResult.rows[2].id;
+  const userId4=userResult.rows[3].id;
+
+
   //Post de pruebas
    const getInfo=await db.query(`
     INSERT INTO posts (title,content,author_id)
-    VALUES ('Life', 'Dime que funciona', 1),
-      ('Dont die','Dime que funciona',1),
-      ('Do not lie to me','Dime que funciona',3),
-      ('The worst party','Dime que funciona',2),
-      ('My house is so big','Dime que funciona',4)
+    VALUES ('Life', 'Dime que funciona', $1),
+      ('Dont die','Dime que funciona',$1),
+      ('Do not lie to me','Dime que funciona',$3),
+      ('The worst party','Dime que funciona',$2),
+      ('My house is so big','Dime que funciona',$4)
     RETURNING *
-  `);
+  `,
+  [userId1,userId2,userId3,userId4]);
   //Retornar un array con los IDs de los posts
   const arrayPostIds=getInfo.rows.map((obj)=>obj.id)
     // Insertarmos categorias
-  await db.query(`
+  const getInfoCategoriesQuery=await db.query(`
     INSERT INTO categories (name)
     VALUES ('personal life'), ('work'), ('experiences'), ('vacation')
-    `)
+    RETURNING id`)
     // Insertamos data a la tabla de categorias de los posts
   const dataPostCategories=`(1,'1'),(2,'2'),(3,'1'),(4,'3'),(5,'4')`;
   await db.query(
@@ -112,16 +123,21 @@ const seedUserPostCommentTestData=async () => {
     INSERT INTO users(email, password,name)
     VALUES('elsenior@gmail.com','PasswordxD','El poeta')
     RETURNING id, email, role`);
-  await db.query(`
+  const userId=getInfoUserQuery.rows[0].id;
+
+  const getInfoPostQuery=await db.query(`
     INSERT INTO posts(title,content,author_id,published)
     VALUES
-    ('No intenten esto en casa','Si quieren quedarse sin cejas por un tiempo juegue con tiner y fuego',1,true),
-    ('No digan mentiras','Nuncan mientan si saben que la otra persona ya sabe la verdad',1,true)
-    `);
+    ('No intenten esto en casa','Si quieren quedarse sin cejas por un tiempo juegue con tiner y fuego',$1,true),
+    ('No digan mentiras','Nuncan mientan si saben que la otra persona ya sabe la verdad',$1,true)
+    RETURNING *`,[userId]);
+  const postIdOne=getInfoPostQuery.rows[0].id;
+  const postIdTwo=getInfoPostQuery.rows[1].id;
+    
   await db.query(`
     INSERT INTO comments(post_id,author_id, content)
-    VALUES(1,1,'Eso no es nada, por jugar con esas cosas me queme el cabello xD')
-    `);
+    VALUES($1,$2,'Eso no es nada, por jugar con esas cosas me queme el cabello xD')
+    `,[postIdOne,userId]);
   
   return getInfoUserQuery.rows[0];
 }

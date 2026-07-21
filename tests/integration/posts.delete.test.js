@@ -17,6 +17,7 @@ describe('DELETE /api/posts/:id',()=>{
     const invalidId=234;
     const idIsNotAnInteger="no_integer"
     beforeAll( async () => {
+        await cleanDataBase()
         const {users,postsId}=await seedUsersWithRolePostsTestData();
         ramdonUser=users[0];
         mainUser=users[1];

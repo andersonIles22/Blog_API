@@ -77,6 +77,7 @@ describe('UPDATE api/posts/:post_id',() => {
 
     const params={
         post_id:1,
+        content:"Pongase serio socio, pongase serio socio!",
         title:"Ahora si muchachos"
     }
     it('update resource by id  successfully',async ()=>{

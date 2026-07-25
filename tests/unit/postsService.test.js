@@ -64,10 +64,10 @@ describe('UPDATE api/posts/:post_id',() => {
     };
     const mockPostResult={
         author_id:1,
-        content:"El titulo es la frase que pensaba que lo dijo Justin Beiber",
+        content:"Como es la wea muchachos",
         id:1,
         published:true,
-        title:"Ahora si muchachos"
+        title:"Ahora si muchachos, o no?"
     }
     beforeEach(()=>{
         jest.clearAllMocks();
@@ -77,11 +77,11 @@ describe('UPDATE api/posts/:post_id',() => {
 
     const params={
         post_id:1,
-        content:"Pongase serio socio, pongase serio socio!",
-        title:"Ahora si muchachos"
+        title:"Ahora si muchachos, oh no",
+        content:"Como es la wea muchachos"
     }
     it('update resource by id  successfully',async ()=>{
-        const result= await postsService.updateResource(params)        
+        const result= await postsService.updateResource(params)
         expect(result).toEqual(mockPostResult)
         expect(postRepository.update).toHaveBeenCalledTimes(1)
     })

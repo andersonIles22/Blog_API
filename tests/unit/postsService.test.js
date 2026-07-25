@@ -53,3 +53,35 @@ describe('GET api/posts',()=>{
         expect(postRepository.getAll).toHaveBeenCalledTimes(1)
     })
 })
+
+describe('UPDATE api/posts/:post_id',() => {
+    const mockPost={
+        author_id:1,
+        content:"El titulo es la frase que pensaba que lo dijo Justin Beiber",
+        id:1,
+        published:true,
+        title:"Nunca digas nunca"
+    };
+    const mockPostResult={
+        author_id:1,
+        content:"El titulo es la frase que pensaba que lo dijo Justin Beiber",
+        id:1,
+        published:true,
+        title:"Ahora si muchachos"
+    }
+    beforeEach(()=>{
+        jest.clearAllMocks();
+        postRepository.getById.mockResolvedValue(mockPost)
+        postRepository.update.mockResolvedValue(mockPostResult)
+    })
+
+    const params={
+        post_id:1,
+        title:"Ahora si muchachos"
+    }
+    it('update resource by id  successfully',async ()=>{
+        const result= await postsService.updateResource(params)        
+        expect(result).toEqual(mockPostResult)
+        expect(postRepository.update).toHaveBeenCalledTimes(1)
+    })
+})

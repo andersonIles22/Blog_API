@@ -86,3 +86,32 @@ describe('UPDATE api/posts/:post_id',() => {
         expect(postRepository.update).toHaveBeenCalledTimes(1)
     })
 })
+
+describe("DELETE api/posts/:post_id",()=>{
+    const mockPost={
+        author_id:1,
+        content:"El titulo es la frase que pensaba que lo dijo Justin Beiber",
+        id:1,
+        published:true,
+        title:"Nunca digas nunca"
+    };
+    const mockResult={
+        id:1,
+        title:"Nunca digas nunca"
+    };
+
+    beforeEach(()=>{
+        jest.clearAllMocks();
+        postRepository.getById.mockResolvedValue(mockPost);
+        postRepository.deletePost.mockResolvedValue(mockResult)
+    })
+
+    const postId=1
+
+    it("delete resource by id sucessfully",async () => {
+        const result= await postsService.deleteResource(postId);
+        expect(result).toEqual(mockResult)
+        expect(postRepository.deletePost).toHaveBeenCalledTimes(1)
+    })
+    
+})

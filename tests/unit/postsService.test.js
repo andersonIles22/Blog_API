@@ -5,10 +5,10 @@ jest.mock('../../src/repositories/postsRepository');
 const postsService=require('../../src/services/postsService')
 const postRepository=require('../../src/repositories/postsRepository');
 const userRepository=require('../../src/repositories/userRepository');
+const { param } = require('express-validator');
 
 
 describe('GET api/posts',()=>{
-
     const mockPosts=[
         {
         author_id:1,
@@ -24,7 +24,7 @@ describe('GET api/posts',()=>{
         published:true,
         title:"Una confesión"
         }
-]
+    ];
 
     beforeEach(()=>{
         jest.clearAllMocks();
@@ -33,25 +33,65 @@ describe('GET api/posts',()=>{
         postRepository.getById.mockResolvedValue(mockPosts[0])
         postRepository.getAll.mockResolvedValue(mockPosts)
     })
+
+    describe('Pass Test Succesfully',()=>{
+        const postId=1
+        const params={
+            page:1,
+            limit:3,
+            author_id:1,
+            published:true
+        }
     
+        it('Get a post by Id',async () => {  
+            const result = await postsService.findById(postId);
+            expect(result).toEqual(mockPosts[0])
+            expect(postRepository.getById).toHaveBeenCalledTimes(1)
+        })
+        it('Get All posts sucessfully',async () => {
+            const result = await postsService.findAllPosts(params)
+            expect(result.data).toEqual(mockPosts)
+            expect(postRepository.getAll).toHaveBeenCalledTimes(1)
+        })
+    })
     
-    const postId=1
-    const params={
-        page:1,
-        limit:3,
-        author_id:1,
-        published:true
-    }
-    it('Get a post by Id',async () => {  
-        const result = await postsService.findById(postId);
-        expect(result).toEqual(mockPosts[0])
-        expect(postRepository.getById).toHaveBeenCalledTimes(1)
+    describe('Fail Test',()=>{
+
+        const mockPost_ErrorAuthor={
+            message:"Post Author not found",
+            statusCode:404
+        };
+
+        const mockPost_ErrorPost={
+            message:"The Post does not exist",
+            statusCode:404
+        }
+        beforeEach(()=>{
+            userRepository.checkAuthor.mockResolvedValue(false);
+            postRepository.getById.mockResolvedValue(undefined)
+        })
+        const postId=1
+        const params={
+            page:1,
+            limit:3,
+            author_id:1,
+            published:true
+        };
+        it('Should fail with 404 if not exist author for findAllPost Service',async () => {
+            await expect(postsService.findAllPosts(params))
+                .rejects
+                .toMatchObject(mockPost_ErrorAuthor)
+            expect(userRepository.checkAuthor).toHaveBeenCalledTimes(1)
+        })
+
+        it('Should fail with 404 if not exist post for findById Service',async () => {
+            await expect(postsService.findById(postId))
+                .rejects
+                .toMatchObject(mockPost_ErrorPost)
+            expect(postRepository.getById).toHaveBeenCalledTimes(1)
+        })
     })
-    it('Get All posts sucessfully',async () => {
-        const result = await postsService.findAllPosts(params)
-        expect(result.data).toEqual(mockPosts)
-        expect(postRepository.getAll).toHaveBeenCalledTimes(1)
-    })
+    
 })
 
 describe('UPDATE api/posts/:post_id',() => {

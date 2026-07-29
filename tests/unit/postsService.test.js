@@ -5,7 +5,6 @@ jest.mock('../../src/repositories/postsRepository');
 const postsService=require('../../src/services/postsService')
 const postRepository=require('../../src/repositories/postsRepository');
 const userRepository=require('../../src/repositories/userRepository');
-const { param } = require('express-validator');
 
 
 describe('GET api/posts',()=>{
@@ -55,7 +54,7 @@ describe('GET api/posts',()=>{
         })
     })
     
-    describe('Fail Test',()=>{
+    describe('Should Fail test',()=>{
 
         const mockPost_ErrorAuthor={
             message:"Post Author not found",
@@ -77,14 +76,14 @@ describe('GET api/posts',()=>{
             author_id:1,
             published:true
         };
-        it('Should fail with 404 if not exist author for findAllPost Service',async () => {
+        it('with 404 if not exist author for findAllPost Service',async () => {
             await expect(postsService.findAllPosts(params))
                 .rejects
                 .toMatchObject(mockPost_ErrorAuthor)
             expect(userRepository.checkAuthor).toHaveBeenCalledTimes(1)
         })
 
-        it('Should fail with 404 if not exist post for findById Service',async () => {
+        it(' with 404 if not exist post for findById Service',async () => {
             await expect(postsService.findById(postId))
                 .rejects
                 .toMatchObject(mockPost_ErrorPost)
@@ -120,10 +119,33 @@ describe('UPDATE api/posts/:post_id',() => {
         title:"Ahora si muchachos, oh no",
         content:"Como es la wea muchachos"
     }
-    it('update resource by id  successfully',async ()=>{
+    describe('Test pass successfuly',()=>{
+        it('update resource by id',async ()=>{
         const result= await postsService.updateResource(params)
         expect(result).toEqual(mockPostResult)
         expect(postRepository.update).toHaveBeenCalledTimes(1)
+    });
+
+    describe('Should fail ',()=>{
+        const mockPost_ErrorPost={
+            message:"The Post does not exist",
+            statusCode:404
+        }
+        beforeEach(()=>{
+            postRepository.getById.mockResolvedValue(undefined)
+        })
+        const params={
+            post_id:1,
+            title:"Ahora si muchachos, oh no",
+            content:"Como es la wea muchachos"
+        }
+        it('with 404 if post does not exist',async () => {
+            await expect(postsService.updateResource(params))
+                .rejects
+                .toMatchObject(mockPost_ErrorPost)
+
+        })
+    })
     })
 })
 
@@ -146,12 +168,30 @@ describe("DELETE api/posts/:post_id",()=>{
         postRepository.deletePost.mockResolvedValue(mockResult)
     })
 
-    const postId=1
+    describe('Test Pass successfully',()=>{
+        const postId=1;
 
-    it("delete resource by id sucessfully",async () => {
-        const result= await postsService.deleteResource(postId);
-        expect(result).toEqual(mockResult)
-        expect(postRepository.deletePost).toHaveBeenCalledTimes(1)
+        it("delete resource by id ",async () => {
+            const result= await postsService.deleteResource(postId);
+            expect(result).toEqual(mockResult)
+            expect(postRepository.deletePost).toHaveBeenCalledTimes(1)
+        })
     })
     
+    describe('Should Fail',()=>{
+
+        beforeEach(()=>{
+            postRepository.getById.mockResolvedValue(undefined)
+        })
+        const postId=1;
+        const mockPost_ErrorPost={
+            message:"The Post does not exist",
+            statusCode:404
+        }
+        it('with 404 if post does not exist',async () => {
+            await expect(postsService.deleteResource(postId))
+                .rejects
+                .toMatchObject(mockPost_ErrorPost)
+        })
+    })
 })

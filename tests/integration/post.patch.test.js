@@ -4,14 +4,6 @@ const {cleanDataBase, seedUsersWithRolePostsTestData}=require('../helpers/databa
 const {generateToken}=require('../helpers/auth.test.helper')
 
 const api=supertest(app);
-
-    let postsIds;  
-    let ramdonUser;
-    let mainUser;
-    let adminUser;
-    let tokenRamdonU;
-    let tokenMainU;
-    let tokenAdmin;
 describe('PATCH /api/posts/:id',()=>{
 
     let postsIds;  

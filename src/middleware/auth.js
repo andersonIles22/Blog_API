@@ -66,11 +66,12 @@ const isOwnerOrRole=(resourceType, allowedRoles = [])=>{
         const currentRepository=repositories[resourceType];
         // Conocer si existe el recurso por id
         const resource=await currentRepository.getById(resourceId)
-        
+        if(!resource) return error(HTTP_STATUS.NOT_FOUND,MESSAGES_OPERATION.POST_NOT_FOUND,next);
+
         // Comprobación de que el usario es el propietario del recurso.
         const getOwnerIdOfResource= await postsRepository.isOwner(data)
-
         if(getOwnerIdOfResource!==id) return error(HTTP_STATUS.FORBIDDEN,MESSAGES_OPERATION.DENIED_ACCESS,next);
+        
         req.resource=resource;
         next()
     }

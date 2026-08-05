@@ -32,7 +32,7 @@ describe('PATCH /api/posts/:id',()=>{
     })
 
     describe('Tests Pass Successfully',()=>{
-        it('status 200 if update a post by the owner',async () => {
+        it('status 200 if a post updated by the owner',async () => {
             const validPostId=postsIds[2];
             const response= await api
                 .patch(`${baseUrl}${validPostId}`)
@@ -43,7 +43,7 @@ describe('PATCH /api/posts/:id',()=>{
             expect(response.status).toBe(200)
         })
 
-        it('status 200 if update a post by the admin',async () => {
+        it('status 200 if a post updated by the admin',async () => {
             const validPostId=postsIds[2];
             const response= await api
                 .patch(`${baseUrl}${validPostId}`)
@@ -52,6 +52,40 @@ describe('PATCH /api/posts/:id',()=>{
                     title:"Pongase Serio socio"
                 })
             expect(response.status).toBe(200)
+        })
+    })
+
+    describe('Tests Fail',()=>{
+        it('status 403 if a post is updated by a random user',async () => {
+            const validPostId=postsIds[2];
+            const response=await api
+                .patch(`${baseUrl}${validPostId}`)
+                .set('Authorization',`Bearer ${tokenRamdonU}`)
+                .send({
+                    title:"Pongase Serio socio"
+                })
+            expect(response.status).toBe(403)
+            expect(response.body).toMatchObject({
+                success:false,
+                error:"Access Denied. Insufficient Permissions"
+            })
+        })
+
+        it('status 404 if a post does not exist', async () => {
+            const invalidPostId=22
+            
+            const response= await api
+                .patch(`${baseUrl}${invalidPostId}`)
+                .set('Authorization',`Bearer ${tokenAdmin}`)
+                .send({
+                    title:"Pongase Serio socio"
+                })
+            
+            expect(response.status).toBe(404)
+            expect(response.body).toMatchObject({
+                success:false,
+                error:"The Post does not exist"
+            })
         })
     })
 })

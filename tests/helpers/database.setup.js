@@ -1,4 +1,3 @@
-const { map } = require('../../src/app');
 const db=require('../../src/config/database');
 const bcrypt=require('bcryptjs');
 

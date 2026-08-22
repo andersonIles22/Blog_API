@@ -6,10 +6,9 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node src/server.js",
     "dev":"cross-env NODE_ENV=development nodemon src/server.js",
-    "test:integration": "cross-env NODE_ENV=test jest tests/integration --coverage --runInBand",
+    "test:integration": "cross-env NODE_ENV=test jest --selectProjects integration --coverage --runInBand",
     "test:watch":"cross-env NODE_ENV=test jest --watchAll --runInBand",
-    "test:unit": "cross-env NODE_ENV=test jest tests/unit --coverage --runInBand",
-    "test:all": "cross-env NODE_ENV=test jest --coverage --runInBand"
+    "test:unit": "jest --selectProjects unit --coverage",
   },
   "keywords": [],
   "author": "",

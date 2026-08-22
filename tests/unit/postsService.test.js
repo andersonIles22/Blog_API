@@ -1,4 +1,3 @@
-jest.resetModules()
 jest.mock('../../src/repositories/userRepository');
 jest.mock('../../src/repositories/postsRepository');
 

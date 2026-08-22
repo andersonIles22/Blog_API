@@ -1,4 +1,3 @@
-// jest.resetModules()
 
 jest.mock('../../src/repositories/commentsRepository');
 jest.mock('../../src/repositories/postsRepository');
@@ -21,7 +20,7 @@ describe('POST /api/posts/:id/comments', ()=>{
         postsRepository.exists.mockResolvedValue(true);
         commentsRepository.create.mockResolvedValue(mockCommentResult);
     })
-
+    
     describe('Test pass successfully',()=>{
         const commentData={
             post_id:1,

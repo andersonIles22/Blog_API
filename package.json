@@ -8,7 +8,7 @@
     "dev":"cross-env NODE_ENV=development nodemon src/server.js",
     "test:integration": "cross-env NODE_ENV=test jest --selectProjects integration --coverage --runInBand",
     "test:watch":"cross-env NODE_ENV=test jest --watchAll --runInBand",
-    "test:unit": "jest --selectProjects unit --coverage",
+    "test:unit": "jest --selectProjects unit --coverage"
   },
   "keywords": [],
   "author": "",

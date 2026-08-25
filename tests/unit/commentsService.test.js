@@ -6,7 +6,70 @@ const postsRepository=require('../../src/repositories/postsRepository');
 
 const commentsService=require('../../src/services/commentsService');
 
+describe(' GET /api/posts/:id/comments',()=>{
+    const mockAllComments=[
+        {
+            id:1,
+            post_id:3,
+            author_id:1,
+            content:"No digas eso papu :C"
+        },
+        {
+            id:2,
+            post_id:3,
+            author_id:3,
+            content:"Eso no pasaba cuando existia un admin"
+        },
+        {
+            id:3,
+            post_id:3,
+            author_id:5,
+            content:"Cuenta en decandencia"
+        }
+    ]
+    const mockCountComments=mockAllComments.length;
 
+    beforeEach(()=>{
+        jest.clearAllMocks();
+        postsRepository.exists.mockResolvedValue(true)
+        commentsRepository.getAll.mockResolvedValue(mockAllComments);
+        commentsRepository.countComments.mockResolvedValue(mockCountComments);
+    })
+
+    describe('Test pass successfully',()=>{
+        const params={
+            postExist:{
+                post_id:3,
+                page:1,
+                limit:3
+            },
+            postNotExist:{
+                post_id:2,
+                page:1,
+                limit:3
+            }
+        }
+        
+        it('Get all commments by Id',async () => {
+            const result=await commentsService.getAll(params.postExist)
+            expect(result.data).toEqual(mockAllComments)
+            expect(commentsRepository.getAll).toHaveBeenCalledTimes(1)
+        })
+        
+        
+        it('Get a result even when the post has no comments', async () => {
+            const mockAllCommentsEmpty=[];
+            
+            postsRepository.exists.mockResolvedValue(true)
+            commentsRepository.getAll.mockResolvedValue(mockAllCommentsEmpty);
+            commentsRepository.countComments.mockResolvedValue(0);
+
+            const result=await commentsService.getAll(params.postNotExist)
+            expect(result.data).toEqual(mockAllCommentsEmpty)
+            expect(commentsRepository.getAll).toHaveBeenCalledTimes(1)
+        })
+    })
+})
 describe('POST /api/posts/:id/comments', ()=>{
 
     const mockCommentResult={
